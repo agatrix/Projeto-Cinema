@@ -31,9 +31,12 @@ public:
   string id;
   string nomeDoCinema;
   double cordX;
-  double cordy;
+  double cordY;
   float preco;
   list<Filme> filmes;
+
+  Cinema(string id, string nomeDoCinema, double cordX, double  cordY, float preco)
+  : id(id), nomeDoCinema(nomeDoCinema), cordX(cordX), cordY(cordY), preco(preco) {}
 };
 
 vector<Filme> lerArquivoFilme(){
@@ -96,11 +99,55 @@ vector<Filme> lerArquivoFilme(){
   return filmes;
 }
 
+vector<Cinema> lerArquivoCinema(){
+  ifstream arquivo("cinemas.txt");
+  vector<Cinema> cinemas;
+  string linha;
+  if (arquivo.is_open()) {
+    getline(arquivo, linha);
+
+    while (getline(arquivo, linha)) {
+      istringstream ss(linha);
+      string ids, nomeDoCinema, cordXStr, cordYStr, precoStr;
+      list<Filme> filmes;
+
+      //>> ws serve para ignorar qualquer espaço em branco que venha antes
+      getline(ss >> ws, ids, ',');
+      getline(ss >> ws, nomeDoCinema, ',');
+      getline(ss >> ws, cordXStr, ',');
+      getline(ss >> ws, cordYStr, ',');
+      getline(ss >> ws, precoStr, ',');
+      
+      
+      try {
+        double cordX = stod(cordXStr);
+        double cordY = stod(cordYStr);
+        float preco = stof(precoStr);
+        
+        Cinema cinema(ids, nomeDoCinema,cordX,cordY,preco);
+              
+        cinemas.push_back(cinema);
+      } 
+      catch (const invalid_argument& e) {
+          cerr << "Erro de conversão: argumento inválido para ano de lançamento, ano de término ou duração" << endl;
+      } catch (const out_of_range& e) {
+          cerr << "Erro de conversão: valor fora do intervalo para ano de lançamento, ano de término ou duração" << endl;
+      }
+    }
+    arquivo.close();
+  }else {
+      cerr << "Não foi possível abrir o arquivo." << endl;
+      return cinemas;
+  }
+  return cinemas;
+}
+
 int main() {
 
   vector<Filme> filmes = lerArquivoFilme();
-  
+  vector<Cinema> cinemas = lerArquivoCinema();
 
+  cout << cinemas[0].nomeDoCinema;
 
   return 0;
 }
