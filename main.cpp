@@ -33,10 +33,10 @@ public:
   double cordX;
   double cordY;
   float preco;
-  list<Filme> filmes;
+  vector<Filme> filmes;
 
-  Cinema(string id, string nomeDoCinema, double cordX, double  cordY, float preco)
-  : id(id), nomeDoCinema(nomeDoCinema), cordX(cordX), cordY(cordY), preco(preco) {}
+  Cinema(string id, string nomeDoCinema, double cordX, double  cordY, float preco, vector<Filme> filmes)
+  : id(id), nomeDoCinema(nomeDoCinema), cordX(cordX), cordY(cordY), preco(preco), filmes(filmes) {}
 };
 
 vector<Filme> lerArquivoFilme(){
@@ -99,55 +99,65 @@ vector<Filme> lerArquivoFilme(){
   return filmes;
 }
 
-vector<Cinema> lerArquivoCinema(){
+vector<Cinema> lerArquivoCinema(vector<Filme> filmes){
   ifstream arquivo("cinemas.txt");
   vector<Cinema> cinemas;
+  vector<Filme> filmesCinema;
   string linha;
   if (arquivo.is_open()) {
     getline(arquivo, linha);
 
     while (getline(arquivo, linha)) {
       istringstream ss(linha);
-      string ids, nomeDoCinema, cordXStr, cordYStr, precoStr;
-      list<Filme> filmes;
+      string ids, nomeDoCinema, cordXStr, cordYStr, precoStr,idFilme;
+      vector<string> idFilmes;
 
       //>> ws serve para ignorar qualquer espaço em branco que venha antes
-      getline(ss >> ws, ids, ',');
+      getline(ss, ids, ',');
       getline(ss >> ws, nomeDoCinema, ',');
       getline(ss >> ws, cordXStr, ',');
       getline(ss >> ws, cordYStr, ',');
       getline(ss >> ws, precoStr, ',');
-      
-      
-      try {
-        double cordX = stod(cordXStr);
-        double cordY = stod(cordYStr);
-        float preco = stof(precoStr);
-        
-        Cinema cinema(ids, nomeDoCinema,cordX,cordY,preco);
-              
-        cinemas.push_back(cinema);
-      } 
-      catch (const invalid_argument& e) {
-          cerr << "Erro de conversão: argumento inválido para ano de lançamento, ano de término ou duração" << endl;
-      } catch (const out_of_range& e) {
-          cerr << "Erro de conversão: valor fora do intervalo para ano de lançamento, ano de término ou duração" << endl;
+      while(getline(ss >> ws, idFilme, ','))
+        idFilmes.push_back(idFilme);
+    
+      for (const auto& idFilme : idFilmes){
+        for(const auto& filme : filmes){
+          if(idFilme == filme.idFilme)
+            filmesCinema.push_back(filme);
+        }
       }
+     
+      double cordX = stod(cordXStr);
+      double cordY = stod(cordYStr);
+      float preco = stof(precoStr);
+      
+      Cinema cinema(ids, nomeDoCinema,cordX,cordY,preco,filmesCinema);
+      
+      cinemas.push_back(cinema);
+      
     }
     arquivo.close();
   }else {
       cerr << "Não foi possível abrir o arquivo." << endl;
       return cinemas;
   }
+  
   return cinemas;
 }
 
 int main() {
 
   vector<Filme> filmes = lerArquivoFilme();
-  vector<Cinema> cinemas = lerArquivoCinema();
+  vector<Cinema> cinemas = lerArquivoCinema(filmes);
 
-  cout << cinemas[0].nomeDoCinema;
+  cout << cinemas[0].filmes[0].tituloOriginal;
+  // for (const auto& cinema : cinemas){
+  //   for(const auto& x : cinema.filmes){
+  //     cout << x.tituloOriginal << " ";
+  //   }
+  //   cout << endl;    
+  // }
 
   return 0;
 }
