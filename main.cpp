@@ -18,7 +18,9 @@ public:
   int anoTermino;
   int duracao;
   string genero;
-Filme(const string& idFilme, const string& tipoDoFilme, const string& tituloPrimario, const string& tituloOriginal,
+
+  //Contrutor Sobrecarregado
+  Filme(const string& idFilme, const string& tipoDoFilme, const string& tituloPrimario, const string& tituloOriginal,
   bool isAdult, int anoLancamento, int anoTermino, int duracao, const string& genero)
 : idFilme(idFilme), tipoDoFilme(tipoDoFilme), tituloPrimario(tituloPrimario), tituloOriginal(tituloOriginal),
   isAdult(isAdult), anoLancamento(anoLancamento), anoTermino(anoTermino), duracao(duracao), genero(genero) {}
@@ -33,8 +35,8 @@ public:
   float preco;
   list<Filme> filmes;
 };
-int main() {
-  // ofstream myStream;
+
+vector<Filme> lerArquivoFilme(){
   ifstream arquivo("filmesCrop.txt");
   vector<Filme> filmes;
   string linha;
@@ -75,19 +77,30 @@ int main() {
     arquivo.close();
   }else {
       cerr << "Não foi possível abrir o arquivo." << endl;
-      return 1;
+      return filmes;
   }
-  for (const auto& filme : filmes) {
-    cout << "ID do Filme: " << filme.idFilme
-         << ", Tipo do Filme: " << filme.tipoDoFilme
-         << ", Título Primário: " << filme.tituloPrimario
-         << ", Título Original: " << filme.tituloOriginal
-         << ", Adulto: " << (filme.isAdult ? "Sim" : "Não")
-         << ", Ano de Lançamento: " << filme.anoLancamento
-         << ", Ano de Término: " << filme.anoTermino
-         << ", Duração: " << filme.duracao
-         << ", Gênero: " << filme.genero << endl;
-  }
+
+  //Repetição para Printar os valores dentro do vector FILMES
+  // for (const auto& filme : filmes) {
+  //   cout << "ID do Filme: " << filme.idFilme
+  //        << ", Tipo do Filme: " << filme.tipoDoFilme
+  //        << ", Título Primário: " << filme.tituloPrimario
+  //        << ", Título Original: " << filme.tituloOriginal
+  //        << ", Adulto: " << (filme.isAdult ? "Sim" : "Não")
+  //        << ", Ano de Lançamento: " << filme.anoLancamento
+  //        << ", Ano de Término: " << filme.anoTermino
+  //        << ", Duração: " << filme.duracao
+  //        << ", Gênero: " << filme.genero << endl;
+  // }
+
+  return filmes;
+}
+
+int main() {
+
+  vector<Filme> filmes = lerArquivoFilme();
+  
+
 
   return 0;
 }
