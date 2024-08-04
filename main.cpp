@@ -4,8 +4,10 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <chrono> // Para medições de tempo
 
 using namespace std;
+using namespace chrono; // contagem de tempo
 
 class Filme {
 public:
@@ -39,6 +41,17 @@ public:
   : id(id), nomeDoCinema(nomeDoCinema), cordX(cordX), cordY(cordY), preco(preco), filmes(filmes) {}
 };
 
+long removeLetraID(string id){
+  string idLong;
+    for (char ch : id) {
+        // Verifica se o caractere não é uma letra
+        if (!isalpha(ch)) {
+            idLong += ch;
+        }
+    }
+    return stol(idLong);
+}
+
 vector<Filme> lerArquivoFilme(){
   ifstream arquivo("filmesCrop.txt");
   vector<Filme> filmes;
@@ -62,9 +75,9 @@ vector<Filme> lerArquivoFilme(){
       
       try {
         bool isAdult = (isAdultStr != "\\N" && isAdultStr == "1");
-        int anoLancamento = (anoLancamentoStr != "\\N") ? stoi(anoLancamentoStr) : 0;
+        int anoLancamento = (anoLancamentoStr != "\\N" && !anoLancamentoStr.empty()) ? stoi(anoLancamentoStr) : 0;
         int anoTermino = (anoTerminoStr != "\\N" && !anoTerminoStr.empty()) ? stoi(anoTerminoStr) : 0;
-        int duracao = (duracaoStr != "\\N") ? stoi(duracaoStr) : 0;
+        int duracao = (duracaoStr != "\\N" && !duracaoStr.empty()) ? stoi(duracaoStr) : 0;
         if(genero =="\\N"){
           genero = "NULL";
         }
@@ -121,12 +134,14 @@ vector<Cinema> lerArquivoCinema(vector<Filme> filmes){
       while(getline(ss >> ws, idFilme, ','))
         idFilmes.push_back(idFilme);
     
-      for (const auto& idFilme : idFilmes){
-        for(const auto& filme : filmes){
-          if(idFilme == filme.idFilme)
-            filmesCinema.push_back(filme);
-        }
-      }
+      // for (const auto& idFilme : idFilmes){
+      //   for(const auto& filme : filmes){
+      //     if(idFilme == filme.idFilme){
+      //       filmesCinema.push_back(filme);
+      //       continue;
+      //     }
+      //   }
+      // }
      
       double cordX = stod(cordXStr);
       double cordY = stod(cordYStr);
@@ -146,18 +161,37 @@ vector<Cinema> lerArquivoCinema(vector<Filme> filmes){
   return cinemas;
 }
 
+vector<Filme*> generoSport(vector<Filme>& filmes){
+  vector<Filme*> sports;
+  
+  for(int i=0;i<filmes.size();i++){
+    if(filmes[i].genero == "Sport")
+      sports.push_back((&filmes[i]));
+  }
+  
+  return sports;
+} 
+
+void printVector(vector<Filme*>& filmes){
+  for(Filme* filme : filmes){
+    cout << filme->tituloOriginal << endl;
+  }
+}
+
+
 int main() {
+  auto inicioTempo = high_resolution_clock::now(); //Inicio contagem de tempo inicializacao
 
   vector<Filme> filmes = lerArquivoFilme();
   vector<Cinema> cinemas = lerArquivoCinema(filmes);
 
-  cout << cinemas[0].filmes[0].tituloOriginal;
-  // for (const auto& cinema : cinemas){
-  //   for(const auto& x : cinema.filmes){
-  //     cout << x.tituloOriginal << " ";
-  //   }
-  //   cout << endl;    
-  // }
+  auto fimTempo = high_resolution_clock::now(); //Fim da contagem de tempoi inicializacao
+  duration<double> duracao = (fimTempo - inicioTempo);
+  cout << "Tempo de Inicialização(segundos): " << duracao.count() << endl;
+  
+  vector<Filme*> filmesSport = generoSport(filmes);
+  printVector(filmesSport);
+  
 
   return 0;
 }
