@@ -11,7 +11,7 @@ using namespace chrono; // contagem de tempo
 
 class Filme {
 public:
-  string idFilme;
+  long idFilme;
   string tipoDoFilme;
   string tituloPrimario;
   string tituloOriginal;
@@ -22,7 +22,7 @@ public:
   string genero;
 
   //Contrutor Sobrecarregado
-  Filme(const string& idFilme, const string& tipoDoFilme, const string& tituloPrimario, const string& tituloOriginal,
+  Filme(long idFilme, const string& tipoDoFilme, const string& tituloPrimario, const string& tituloOriginal,
   bool isAdult, int anoLancamento, int anoTermino, int duracao, const string& genero)
 : idFilme(idFilme), tipoDoFilme(tipoDoFilme), tituloPrimario(tituloPrimario), tituloOriginal(tituloOriginal),
   isAdult(isAdult), anoLancamento(anoLancamento), anoTermino(anoTermino), duracao(duracao), genero(genero) {}
@@ -81,7 +81,8 @@ vector<Filme> lerArquivoFilme(){
         if(genero =="\\N"){
           genero = "NULL";
         }
-        Filme filme(ids, tipo, tituloPrimario, tituloOriginal, isAdult, anoLancamento, anoTermino, duracao, genero);
+        long idLong = (!ids.empty()) ? removeLetraID(ids):0;
+        Filme filme(idLong, tipo, tituloPrimario, tituloOriginal, isAdult, anoLancamento, anoTermino, duracao, genero);
               
         filmes.push_back(filme);
       } catch (const invalid_argument& e) {
@@ -117,13 +118,15 @@ vector<Cinema> lerArquivoCinema(vector<Filme> filmes){
   vector<Cinema> cinemas;
   vector<Filme> filmesCinema;
   string linha;
+  int auxFilmes; //auxiliar para atribuir os filmes do cinema
+
   if (arquivo.is_open()) {
     getline(arquivo, linha);
 
     while (getline(arquivo, linha)) {
       istringstream ss(linha);
       string ids, nomeDoCinema, cordXStr, cordYStr, precoStr,idFilme;
-      vector<string> idFilmes;
+      vector<long> idFilmes;
 
       //>> ws serve para ignorar qualquer espaço em branco que venha antes
       getline(ss, ids, ',');
@@ -131,17 +134,20 @@ vector<Cinema> lerArquivoCinema(vector<Filme> filmes){
       getline(ss >> ws, cordXStr, ',');
       getline(ss >> ws, cordYStr, ',');
       getline(ss >> ws, precoStr, ',');
-      while(getline(ss >> ws, idFilme, ','))
-        idFilmes.push_back(idFilme);
+      while(getline(ss >> ws, idFilme, ',')){
+        long id = removeLetraID(idFilme);
+        idFilmes.push_back(id);
+      }
     
-      // for (const auto& idFilme : idFilmes){
-      //   for(const auto& filme : filmes){
-      //     if(idFilme == filme.idFilme){
-      //       filmesCinema.push_back(filme);
-      //       continue;
-      //     }
-      //   }
-      // }
+      for (const auto& idFilme : idFilmes){
+        auxFilmes = 0;
+        for(const auto& filme : filmes){
+          if(idFilme-filme.idFilme <= 0){
+            filmesCinema.push_back(filme);
+            break;
+          }
+        }
+      }
      
       double cordX = stod(cordXStr);
       double cordY = stod(cordYStr);
@@ -150,7 +156,7 @@ vector<Cinema> lerArquivoCinema(vector<Filme> filmes){
       Cinema cinema(ids, nomeDoCinema,cordX,cordY,preco,filmesCinema);
       
       cinemas.push_back(cinema);
-      
+      filmesCinema.clear();
     }
     arquivo.close();
   }else {
@@ -196,8 +202,14 @@ int main() {
   cout << "Tempo de Inicialização(segundos): " << duracao.count() << endl;
   
   vector<Filme*> filmesSport = geraVectorGenero(filmes, "Sport");
-  printVector(filmesSport);
-  
+  //printVector(filmesSport);
+  for(Cinema cinema : cinemas){
+    cout << "Nome cinema: " << cinema.nomeDoCinema << endl;
+    cout << "filmes: ";
+    for(Filme filme : cinema.filmes){
+      cout << filme.tituloOriginal << endl;
+    }
+  }
 
   return 0;
 }
