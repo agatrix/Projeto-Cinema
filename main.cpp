@@ -161,17 +161,23 @@ vector<Cinema> lerArquivoCinema(vector<Filme> filmes){
   return cinemas;
 }
 
-vector<Filme*> generoSport(vector<Filme>& filmes){
-  vector<Filme*> sports;
-  
+vector<Filme*> geraVectorGenero(vector<Filme>& filmes, string genero){
+  vector<Filme*> vectorGenero;
+ 
+  string palavra;
   for(int i=0;i<filmes.size();i++){
-    if(filmes[i].genero == "Sport")
-      sports.push_back((&filmes[i]));
+    stringstream ss(filmes[i].genero); 
+    while (getline(ss, palavra, ',')) { //Pega as palavras do genero separados por virgula
+      if(palavra == genero)
+      vectorGenero.push_back((&filmes[i]));
+    }
+    
   }
   
-  return sports;
+  return vectorGenero;
 } 
 
+//Função para printar os vectors de filmes
 void printVector(vector<Filme*>& filmes){
   for(Filme* filme : filmes){
     cout << filme->tituloOriginal << endl;
@@ -189,7 +195,7 @@ int main() {
   duration<double> duracao = (fimTempo - inicioTempo);
   cout << "Tempo de Inicialização(segundos): " << duracao.count() << endl;
   
-  vector<Filme*> filmesSport = generoSport(filmes);
+  vector<Filme*> filmesSport = geraVectorGenero(filmes, "Sport");
   printVector(filmesSport);
   
 
