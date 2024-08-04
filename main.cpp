@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <chrono> // Para medições de tempo
+#include <set> //Utilizar o set, para unificar
 
 using namespace std;
 using namespace chrono; // contagem de tempo
@@ -183,13 +184,20 @@ vector<Filme*> geraVectorGenero(vector<Filme>& filmes, string genero){
   return vectorGenero;
 } 
 
+void pegarGeneros(const string& genero, set<string>& generosFilme) {
+    stringstream ss(genero);
+    string item;
+    while (getline(ss, item, ',')) {
+        generosFilme.insert(item);
+    }
+}
+
 //Função para printar os vectors de filmes
 void printVector(vector<Filme*>& filmes){
   for(Filme* filme : filmes){
     cout << filme->tituloOriginal << endl;
   }
 }
-
 
 int main() {
   auto inicioTempo = high_resolution_clock::now(); //Inicio contagem de tempo inicializacao
@@ -199,17 +207,25 @@ int main() {
 
   auto fimTempo = high_resolution_clock::now(); //Fim da contagem de tempoi inicializacao
   duration<double> duracao = (fimTempo - inicioTempo);
-  cout << "Tempo de Inicialização(segundos): " << duracao.count() << endl;
+
+  set<string> generos;  //O set permite a unificação dos elementos
+  for(Filme filme : filmes){
+    pegarGeneros(filme.genero, generos);
+  }
+
+  for (const auto& elem : generos) {
+    cout << elem << endl;
+  }
   
   vector<Filme*> filmesSport = geraVectorGenero(filmes, "Sport");
   //printVector(filmesSport);
-  for(Cinema cinema : cinemas){
-    cout << "Nome cinema: " << cinema.nomeDoCinema << endl;
-    cout << "filmes: ";
-    for(Filme filme : cinema.filmes){
-      cout << filme.tituloOriginal << endl;
-    }
-  }
-
+  // for(Cinema cinema : cinemas){
+  //   cout << "Nome cinema: " << cinema.nomeDoCinema << endl;
+  //   cout << "filmes: ";
+  //   for(Filme filme : cinema.filmes){
+  //     cout << filme.tituloOriginal << endl;
+  //   }
+  // }
+  cout << "Tempo de Inicialização(segundos): " << duracao.count() << endl;
   return 0;
 }
