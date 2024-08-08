@@ -248,14 +248,13 @@ int main() {
 
 
   //TENTAR PEGAR APENAS UM GENERO
-  auto i = matrizTipos.find("video");
   for (const auto& [tiposFilme, filmes] : matrizTipos) {
-      if(i != matrizTipos.end()){
-        cout << tiposFilme << ":\n";
-        for (const auto& filme : filmes) {
-            cout << "  " << filme->tituloOriginal << " (" << filme->tipoDoFilme << ")\n";
-        }
+    if(tiposFilme == "videoGame"){
+      cout << tiposFilme << ":\n";
+      for (const auto& filme : filmes) {
+          cout << "  " << filme->tituloOriginal << " (" << filme->tipoDoFilme << ")\n";
       }
+    }
   }
 
 
