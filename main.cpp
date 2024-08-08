@@ -6,6 +6,7 @@
 #include <vector>
 #include <chrono> // Para medições de tempo
 #include <set> //Utilizar o set, para unificar
+#include <map> //Utilização de map
 
 using namespace std;
 using namespace chrono; // contagem de tempo
@@ -168,27 +169,41 @@ vector<Cinema> lerArquivoCinema(vector<Filme> filmes){
   return cinemas;
 }
 
-vector<Filme*> geraVectorGenero(vector<Filme>& filmes, string genero){
-  vector<Filme*> vectorGenero;
+map<string,vector<Filme*>> gerarMatrizGenero(vector<Filme>& filmes, string genero,map<string,vector<Filme*>>& matrizGenero){
  
   string palavra;
   for(int i=0;i<filmes.size();i++){
     stringstream ss(filmes[i].genero); 
     while (getline(ss, palavra, ',')) { //Pega as palavras do genero separados por virgula
       if(palavra == genero)
-      vectorGenero.push_back((&filmes[i]));
+      matrizGenero[genero].emplace_back(&filmes[i]);
     }
     
   }
   
-  return vectorGenero;
+  return matrizGenero;
 } 
 
-void pegarGeneros(const string& genero, set<string>& generosFilme) {
+map<string,vector<Filme*>> gerarMatrizTipo(vector<Filme>& filmes, string tipoFilme,map<string,vector<Filme*>>& matrizTipo){
+ 
+  string palavra;
+  for(int i=0;i<filmes.size();i++){
+    stringstream ss(filmes[i].tipoDoFilme); 
+    while (getline(ss, palavra, ',')) { //Pega as palavras do tipoFilme separados por virgula
+      if(palavra == tipoFilme)
+      matrizTipo[tipoFilme].emplace_back(&filmes[i]);
+    }
+    
+  }
+  
+  return matrizTipo;
+} 
+
+void separarTipos(const string& genero, set<string>& set_) {
     stringstream ss(genero);
     string item;
     while (getline(ss, item, ',')) {
-        generosFilme.insert(item);
+        set_.insert(item);
     }
 }
 
@@ -208,16 +223,42 @@ int main() {
   auto fimTempo = high_resolution_clock::now(); //Fim da contagem de tempoi inicializacao
   duration<double> duracao = (fimTempo - inicioTempo);
 
-  set<string> generos;  //O set permite a unificação dos elementos
+  set<string> generos;    //O set permite a unificação dos elementos
+  set<string> tiposFilme; //
+
   for(Filme filme : filmes){
-    pegarGeneros(filme.genero, generos);
+    separarTipos(filme.genero, generos); //Separa os filmes Generos
+  }
+  for(Filme filme : filmes){
+    separarTipos(filme.tipoDoFilme, tiposFilme); //Separa os filmes por Tipo
   }
 
-  for (const auto& elem : generos) {
-    cout << elem << endl;
+  //vector<Filme*> filmesSport = gerarMatrizGenero(filmes, "Sport");
+  map<string,vector<Filme*>> matrizGeneros;
+  map<string,vector<Filme*>> matrizTipos;
+
+  for (string elem : generos) {
+    matrizGeneros = (gerarMatrizGenero(filmes,elem,matrizGeneros));
+  }
+
+  for (string elem : tiposFilme) {
+    matrizTipos = (gerarMatrizTipo(filmes,elem,matrizTipos));
   }
   
-  vector<Filme*> filmesSport = geraVectorGenero(filmes, "Sport");
+
+
+  //TENTAR PEGAR APENAS UM GENERO
+  auto i = matrizTipos.find("video");
+  for (const auto& [tiposFilme, filmes] : matrizTipos) {
+      if(i != matrizTipos.end()){
+        cout << tiposFilme << ":\n";
+        for (const auto& filme : filmes) {
+            cout << "  " << filme->tituloOriginal << " (" << filme->tipoDoFilme << ")\n";
+        }
+      }
+  }
+
+
   //printVector(filmesSport);
   // for(Cinema cinema : cinemas){
   //   cout << "Nome cinema: " << cinema.nomeDoCinema << endl;
