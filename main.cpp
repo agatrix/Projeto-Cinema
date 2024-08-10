@@ -281,14 +281,25 @@ int buscaBinariaInt(const vector<int>& valor, int valor_procurado) {
     return -1;
 }
 
+void verificarRepeticao(vector<Filme*>& solucao,Filme* filme, int id){
+  if(solucao.empty()){
+    solucao.push_back(filme);
+    return;
+  }
+
+  if(buscaBinariaFilmes(solucao,id)==-1){
+    solucao.push_back(filme);
+  }
+}
+
 void filtrarOU (vector<Filme*>& filmes1, vector<Filme*>& filmes2, vector<Filme*>& solucao){
   for(auto filme : filmes1){
-    solucao.push_back(filme);
+    verificarRepeticao(solucao,filme,filme->idFilme);
   }
   for(int j = 0; j<filmes2.size();j++){
     int indice = buscaBinariaFilmes(filmes1,filmes2[j]->idFilme);
     if(indice == -1)
-      solucao.push_back(filmes2[j]);
+      verificarRepeticao(solucao,filmes2[j],filmes2[j]->idFilme);
   }
 }
 
@@ -296,7 +307,7 @@ void filtrarE(vector<Filme*>& filmes1, vector<Filme*>& filmes2, vector<Filme*>& 
   for(int j = 0; j<filmes2.size();j++){
     int indice = buscaBinariaFilmes(filmes1,filmes2[j]->idFilme);
     if(indice != -1)
-      solucao.push_back(filmes2[j]);
+      verificarRepeticao(solucao,filmes2[j],filmes2[j]->idFilme);
   }
 
 }
@@ -435,23 +446,12 @@ int main() {
   vector<Filme*> solucao;
 
   filtrar(matrizGenero[opcoesGenero[0]],matrizGenero[opcoesGenero[1]],solucao,1,opcoesGenero);
+  filtrar(matrizGenero[opcoesGenero[0]],matrizGenero[opcoesGenero[1]],solucao,1,opcoesGenero);
 
   for(auto x:solucao){
     cout << x->tituloOriginal << endl;
   }
 
-  // if(tamanhoGenero[0]<tamanhoGenero[2]){
-  //   for(int i=0;i<tamanhoGenero[2];i++){
-  //     solucao.push_back(matrizGenero[2][i]);
-  //   }
-    
-  //   for(int j = 0; j<tamanhoGenero[0];j++){
-  //     int indice = buscaBinariaFilmes(matrizGenero[2],matrizGenero[0][j]->idFilme);
-  //     if(indice == -1)
-  //       cout << matrizGenero[0][j]->tituloOriginal << endl;
-  //   }
-
-  // }
   auto fimTempoFiltro = high_resolution_clock::now(); //Fim da contagem de tempoi inicializacao
   duration<double> duracaoFiltro = (fimTempoFiltro - inicioTempoFiltro);
 
