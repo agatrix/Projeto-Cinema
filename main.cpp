@@ -55,7 +55,7 @@ long removeLetraID(string id){
 }
 
 vector<Filme> lerArquivoFilme(){
-  ifstream arquivo("f.txt");
+  ifstream arquivo("filmesCrop.txt");
   vector<Filme> filmes;
   string linha;
   if (arquivo.is_open()) {
@@ -169,40 +169,10 @@ vector<Cinema> lerArquivoCinema(vector<Filme> filmes){
   return cinemas;
 }
 
-// map<string,vector<Filme*>> gerarMatrizGenero(vector<Filme>& filmes, string genero,map<string,vector<Filme*>>& matrizGenero){
- 
-//   string palavra;
-//   for(int i=0;i<filmes.size();i++){
-//     stringstream ss(filmes[i].genero); 
-//     while (getline(ss, palavra, ',')) { //Pega as palavras do genero separados por virgula
-//       if(palavra == genero)
-//       matrizGenero[genero].emplace_back(&filmes[i]);
-//     }
-    
-//   }
-  
-//   return matrizGenero;
-// } 
-
-// map<string,vector<Filme*>> gerarMatrizTipo(vector<Filme>& filmes, string tipoFilme,map<string,vector<Filme*>>& matrizTipo){
- 
-//   string palavra;
-//   for(int i=0;i<filmes.size();i++){
-//     stringstream ss(filmes[i].tipoDoFilme); 
-//     while (getline(ss, palavra, ',')) { //Pega as palavras do tipoFilme separados por virgula
-//       if(palavra == tipoFilme)
-//       matrizTipo[tipoFilme].emplace_back(&filmes[i]);
-//     }
-    
-//   }
-  
-//   return matrizTipo;
-// } 
-
 vector<Filme*> geraVectorGenero(vector<Filme>& filmes, string genero){
   vector<Filme*> vectorGenero;
- 
   string palavra;
+
   for(int i=0;i<filmes.size();i++){
     stringstream ss(filmes[i].genero); 
     while (getline(ss, palavra, ',')) { //Pega as palavras do genero separados por virgula
@@ -211,7 +181,7 @@ vector<Filme*> geraVectorGenero(vector<Filme>& filmes, string genero){
     }
     
   }
-  
+
   return vectorGenero;
 } 
 
@@ -230,6 +200,31 @@ void printVector(vector<Filme*>& filmes){
   }
 }
 
+// Função para realizar a busca binária
+int buscaBinaria(const vector<Filme*>& filmes, int valor_procurado) {
+    int esquerda = 0;
+    int direita = filmes.size() - 1;
+
+    while (esquerda <= direita) {
+        int meio = esquerda + (direita - esquerda) / 2;
+
+        // Verifica se o valor_procurado está no meio
+        if (filmes[meio]->idFilme == valor_procurado) {
+            return meio; // Valor encontrado, retorna o índice
+        }
+
+        // Se o valor_procurado é maior, ignore a metade esquerda
+        if (filmes[meio]->idFilme < valor_procurado) {
+            esquerda = meio + 1;
+        } 
+        // Se o valor_procurado é menor, ignore a metade direita
+        else {
+            direita = meio - 1;
+        }
+    }
+    return -1;
+}
+
 int main() {
   auto inicioTempo = high_resolution_clock::now(); //Inicio contagem de tempo inicializacao
 
@@ -239,50 +234,42 @@ int main() {
   set<string> generos;    //O set permite a unificação dos elementos
   set<string> tiposFilme; 
 
+  vector<vector<Filme*>> matrizGenero; //Cria uma matriz onde cada linha possui filmes um genero
+  
+  vector<int> tamanhoGenero; //Pega o tamanho de cada linha, ou seja, a quantidade de filmes daquele genero
+  
+
   for(Filme filme : filmes){
     separarTipos(filme.genero, generos); //Separa os filmes Generos
   }
+
   for(Filme filme : filmes){
     separarTipos(filme.tipoDoFilme, tiposFilme); //Separa os filmes por Tipo
   }
 
-  vector<vector<Filme*>> matrizGenero;
-
-  for(string genero : generos){
-    cout<<genero<<endl;
+  for(string genero : generos){ //Cria matriz de generos
     matrizGenero.push_back(geraVectorGenero(filmes,genero));
   }
 
-  for (const auto& linha : matrizGenero) {
-    for (const auto& valor : linha) {
-      cout << valor->tituloOriginal << " ";
+  for(auto x : matrizGenero){ //Repeticao para pegar a quantiadade de filmes por generos 
+    tamanhoGenero.push_back(x.size());
+  }
+
+  vector<Filme*> solucao;
+
+  if(tamanhoGenero[0]<tamanhoGenero[2]){
+    for(int i=0;i<tamanhoGenero[2];i++){
+      solucao.push_back(matrizGenero[2][i]);
     }
-    cout << endl;
+    
+    for(int j = 0; j<tamanhoGenero[0];j++){
+      int indice = buscaBinaria(matrizGenero[2],matrizGenero[0][j]->idFilme);
+      if(indice == -1)
+        cout << matrizGenero[0][j]->tituloOriginal << endl;
+    }
+
   }
 
-
-/* UTILIZAÇÂO DE MAP
-
-  map<string,vector<Filme*>> matrizGeneros;
-  map<string,vector<Filme*>> matrizTipos;
-
-  for (string elem : generos) {
-    matrizGeneros = (gerarMatrizGenero(filmes,elem,matrizGeneros));
-  }
-
-  for (string elem : tiposFilme) {
-    matrizTipos = (gerarMatrizTipo(filmes,elem,matrizTipos));
-  }
-  
-  vector<int> tamanhoTipo;
-  
-  for (const auto& [tiposFilme, filmes] : matrizTipos) {
-      tamanhoTipo.push_back(filmes.size());
-      // for (const auto& filme : filmes) {
-      //     cout << "  " << filme->tituloOriginal << " (" << filme->tipoDoFilme << ")\n";
-      // }
-  }
-*/
 
   auto fimTempo = high_resolution_clock::now(); //Fim da contagem de tempoi inicializacao
   duration<double> duracao = (fimTempo - inicioTempo);
