@@ -232,8 +232,8 @@ void printVector(vector<Filme*>& filmes){
   }
 }
 
-// Função para realizar a busca binária
-int buscaBinaria(const vector<Filme*>& filmes, int valor_procurado) {
+// Função para realizar a busca binária no vector de FILMES
+int buscaBinariaFilmes(const vector<Filme*>& filmes, int valor_procurado) {
     int esquerda = 0;
     int direita = filmes.size() - 1;
 
@@ -257,10 +257,66 @@ int buscaBinaria(const vector<Filme*>& filmes, int valor_procurado) {
     return -1;
 }
 
-vector<Filme*> filtrar(vector<Filme*>& filmes1, vector<Filme*> filmes2, vector<Filme*>solucao){
-  
+int buscaBinariaInt(const vector<int>& valor, int valor_procurado) {
+    int esquerda = 0;
+    int direita = valor.size() - 1;
 
-  return solucao;
+    while (esquerda <= direita) {
+        int meio = esquerda + (direita - esquerda) / 2;
+
+        // Verifica se o valor_procurado está no meio
+        if (valor[meio] == valor_procurado) {
+            return meio; // Valor encontrado, retorna o índice
+        }
+
+        // Se o valor_procurado é maior, ignore a metade esquerda
+        if (valor[meio] < valor_procurado) {
+            esquerda = meio + 1;
+        } 
+        // Se o valor_procurado é menor, ignore a metade direita
+        else {
+            direita = meio - 1;
+        }
+    }
+    return -1;
+}
+
+void filtrarOU (vector<Filme*>& filmes1, vector<Filme*>& filmes2, vector<Filme*>& solucao){
+  for(auto filme : filmes1){
+    solucao.push_back(filme);
+  }
+  for(int j = 0; j<filmes2.size();j++){
+    int indice = buscaBinariaFilmes(filmes1,filmes2[j]->idFilme);
+    if(indice == -1)
+      solucao.push_back(filmes2[j]);
+  }
+}
+
+void filtrarE(vector<Filme*>& filmes1, vector<Filme*>& filmes2, vector<Filme*>& solucao){
+  for(int j = 0; j<filmes2.size();j++){
+    int indice = buscaBinariaFilmes(filmes1,filmes2[j]->idFilme);
+    if(indice != -1)
+      solucao.push_back(filmes2[j]);
+  }
+
+}
+
+void filtrar(vector<Filme*>& filmes1, vector<Filme*>& filmes2, vector<Filme*>& solucao, int operador, vector<int>& opcoes){
+  
+  if(operador==0){ //operador == 0 "OU"
+    if(filmes1.size() >= filmes2.size()){
+      filtrarOU(filmes1,filmes2,solucao);
+    }else{
+      filtrarOU(filmes2,filmes1,solucao);
+    }
+  }else{
+    if(filmes1.size() >= filmes2.size()){
+      filtrarE(filmes2,filmes1,solucao);
+    }else{
+      filtrarE(filmes1,filmes2,solucao);
+    }
+  }
+
 }
 
 // Função para trocar dois elementos
@@ -318,6 +374,8 @@ int main() {
   vector<int> tamanhoGenero; //Pega o tamanho de cada linha, ou seja, a quantidade de filmes daquele genero
   vector<int> tamanhoDuracao;
 
+  vector<int> opcoesGenero = {0,2};
+
   for(Filme filme : filmes){
     separarTipos(filme.genero, generos); //Separa os filmes Generos
   }
@@ -333,13 +391,11 @@ int main() {
   //Criacao do vector de duracao
   vector<int> duracoesFilme;
   for(auto x : duracaosFilmes){
-    duracoesFilme.push_back(stoi(x));
+    if(stoi(x) != 0)
+      duracoesFilme.push_back(stoi(x));
   }
+  duracaosFilmes.clear(); //Limpamos o set para limpar memoria
   quickSort(duracoesFilme);
-
-  for(auto x : duracoesFilme)
-    cout << x << endl;
-
 
   for(string genero : generos){ //Cria matriz de generos
     matrizGenero.push_back(geraVectorGenero(filmes,genero));
@@ -349,25 +405,40 @@ int main() {
     matrizDuracao.push_back(geraVectorDuracao(filmes,duracoes));
   }
 
-  // for(int i=0 ; i<4; i++){
-  //   cout << matrizDuracao[i][0]->duracao << endl;
-  // }
-
-
   for(auto x : matrizGenero){ //Repeticao para pegar a quantiadade de filmes por generos 
     tamanhoGenero.push_back(x.size());
   }
 
+  auto fimTempo = high_resolution_clock::now(); //Fim da contagem de tempoi inicializacao
+  duration<double> duracaoInit = (fimTempo - inicioTempo);
+
+  cout << "Tempo de Inicialização(segundos): " << duracaoInit.count() << endl;
+  //FIM DA INICIALIZACAO
+
+  //INICIO FILTRAGEM
+  auto inicioTempoFiltro = high_resolution_clock::now(); //Inicio contagem de tempo inicializacao
+
+  int indice = buscaBinariaInt(duracoesFilme, 1);
+
   for(int i = 0; i < duracoesFilme.size(); i++){
-    if(matrizDuracao[i][0]->duracao==12){
+    if(matrizDuracao[i][0]->duracao>10)
+      break;
+
+    if(matrizDuracao[i][0]->duracao>=0 && matrizDuracao[i][0]->duracao<=1){
       for(auto x:matrizDuracao[i]){
-        cout << x->tituloOriginal << " ";
+        //cout << x->tituloOriginal << " ";
       }
-      cout << endl;
+      //cout << endl;
     }
   }
 
   vector<Filme*> solucao;
+
+  filtrar(matrizGenero[opcoesGenero[0]],matrizGenero[opcoesGenero[1]],solucao,1,opcoesGenero);
+
+  for(auto x:solucao){
+    cout << x->tituloOriginal << endl;
+  }
 
   // if(tamanhoGenero[0]<tamanhoGenero[2]){
   //   for(int i=0;i<tamanhoGenero[2];i++){
@@ -375,17 +446,16 @@ int main() {
   //   }
     
   //   for(int j = 0; j<tamanhoGenero[0];j++){
-  //     int indice = buscaBinaria(matrizGenero[2],matrizGenero[0][j]->idFilme);
+  //     int indice = buscaBinariaFilmes(matrizGenero[2],matrizGenero[0][j]->idFilme);
   //     if(indice == -1)
   //       cout << matrizGenero[0][j]->tituloOriginal << endl;
   //   }
 
   // }
+  auto fimTempoFiltro = high_resolution_clock::now(); //Fim da contagem de tempoi inicializacao
+  duration<double> duracaoFiltro = (fimTempoFiltro - inicioTempoFiltro);
 
-
-  auto fimTempo = high_resolution_clock::now(); //Fim da contagem de tempoi inicializacao
-  duration<double> duracao = (fimTempo - inicioTempo);
-
-  cout << "Tempo de Inicialização(segundos): " << duracao.count() << endl;
+  cout << "Tempo de Filtragem(segundos): " << duracaoFiltro.count() << endl;
+  
   return 0;
 }

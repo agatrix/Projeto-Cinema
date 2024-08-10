@@ -1,7 +1,7 @@
 tconst	titleType	primaryTitle	originalTitle	isAdult	startYear	endYear	runtimeMinutes	genres
 tt7917518	short	The Battle II	The Battle II	0	2008	\N	\N	Action,Short
-tt7917530	video	Aftermath	Aftermath	0	2016	\N	5	Animation,Drama,Music
+tt7917530	video	Aftermath	Aftermath	0	2016	\N	5	Animation,Drama,Music,Action
 tt7917532	short	Ironheart	Ironheart	0	2018	\N	12	Drama,History,Short
 tt7917534	tvEpisode	Episode #2.7	Episode #2.7	0	2017	\N	\N	Comedy
 tt7917540	tvEpisode	Episode #2.8	Episode #2.8	0	2017	\N	\N	Comedy
-tt7917552	short	LULU	LULU	0	2018	\N	12	Comedy,Drama
+tt7917552	short	LULU	LULU	0	2018	\N	12	Comedy,Drama,Action
