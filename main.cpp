@@ -55,7 +55,7 @@ long removeLetraID(string id){
 }
 
 vector<Filme> lerArquivoFilme(){
-  ifstream arquivo("filmesCrop.txt");
+  ifstream arquivo("f.txt");
   vector<Filme> filmes;
   string linha;
   if (arquivo.is_open()) {
@@ -169,34 +169,50 @@ vector<Cinema> lerArquivoCinema(vector<Filme> filmes){
   return cinemas;
 }
 
-map<string,vector<Filme*>> gerarMatrizGenero(vector<Filme>& filmes, string genero,map<string,vector<Filme*>>& matrizGenero){
+// map<string,vector<Filme*>> gerarMatrizGenero(vector<Filme>& filmes, string genero,map<string,vector<Filme*>>& matrizGenero){
+ 
+//   string palavra;
+//   for(int i=0;i<filmes.size();i++){
+//     stringstream ss(filmes[i].genero); 
+//     while (getline(ss, palavra, ',')) { //Pega as palavras do genero separados por virgula
+//       if(palavra == genero)
+//       matrizGenero[genero].emplace_back(&filmes[i]);
+//     }
+    
+//   }
+  
+//   return matrizGenero;
+// } 
+
+// map<string,vector<Filme*>> gerarMatrizTipo(vector<Filme>& filmes, string tipoFilme,map<string,vector<Filme*>>& matrizTipo){
+ 
+//   string palavra;
+//   for(int i=0;i<filmes.size();i++){
+//     stringstream ss(filmes[i].tipoDoFilme); 
+//     while (getline(ss, palavra, ',')) { //Pega as palavras do tipoFilme separados por virgula
+//       if(palavra == tipoFilme)
+//       matrizTipo[tipoFilme].emplace_back(&filmes[i]);
+//     }
+    
+//   }
+  
+//   return matrizTipo;
+// } 
+
+vector<Filme*> geraVectorGenero(vector<Filme>& filmes, string genero){
+  vector<Filme*> vectorGenero;
  
   string palavra;
   for(int i=0;i<filmes.size();i++){
     stringstream ss(filmes[i].genero); 
     while (getline(ss, palavra, ',')) { //Pega as palavras do genero separados por virgula
       if(palavra == genero)
-      matrizGenero[genero].emplace_back(&filmes[i]);
+      vectorGenero.push_back((&filmes[i]));
     }
     
   }
   
-  return matrizGenero;
-} 
-
-map<string,vector<Filme*>> gerarMatrizTipo(vector<Filme>& filmes, string tipoFilme,map<string,vector<Filme*>>& matrizTipo){
- 
-  string palavra;
-  for(int i=0;i<filmes.size();i++){
-    stringstream ss(filmes[i].tipoDoFilme); 
-    while (getline(ss, palavra, ',')) { //Pega as palavras do tipoFilme separados por virgula
-      if(palavra == tipoFilme)
-      matrizTipo[tipoFilme].emplace_back(&filmes[i]);
-    }
-    
-  }
-  
-  return matrizTipo;
+  return vectorGenero;
 } 
 
 void separarTipos(const string& genero, set<string>& set_) {
@@ -220,11 +236,8 @@ int main() {
   vector<Filme> filmes = lerArquivoFilme();
   vector<Cinema> cinemas = lerArquivoCinema(filmes);
 
-  auto fimTempo = high_resolution_clock::now(); //Fim da contagem de tempoi inicializacao
-  duration<double> duracao = (fimTempo - inicioTempo);
-
   set<string> generos;    //O set permite a unificação dos elementos
-  set<string> tiposFilme; //
+  set<string> tiposFilme; 
 
   for(Filme filme : filmes){
     separarTipos(filme.genero, generos); //Separa os filmes Generos
@@ -233,7 +246,23 @@ int main() {
     separarTipos(filme.tipoDoFilme, tiposFilme); //Separa os filmes por Tipo
   }
 
-  //vector<Filme*> filmesSport = gerarMatrizGenero(filmes, "Sport");
+  vector<vector<Filme*>> matrizGenero;
+
+  for(string genero : generos){
+    cout<<genero<<endl;
+    matrizGenero.push_back(geraVectorGenero(filmes,genero));
+  }
+
+  for (const auto& linha : matrizGenero) {
+    for (const auto& valor : linha) {
+      cout << valor->tituloOriginal << " ";
+    }
+    cout << endl;
+  }
+
+
+/* UTILIZAÇÂO DE MAP
+
   map<string,vector<Filme*>> matrizGeneros;
   map<string,vector<Filme*>> matrizTipos;
 
@@ -245,27 +274,19 @@ int main() {
     matrizTipos = (gerarMatrizTipo(filmes,elem,matrizTipos));
   }
   
-
-
-  //TENTAR PEGAR APENAS UM GENERO
+  vector<int> tamanhoTipo;
+  
   for (const auto& [tiposFilme, filmes] : matrizTipos) {
-    if(tiposFilme == "videoGame"){
-      cout << tiposFilme << ":\n";
-      for (const auto& filme : filmes) {
-          cout << "  " << filme->tituloOriginal << " (" << filme->tipoDoFilme << ")\n";
-      }
-    }
+      tamanhoTipo.push_back(filmes.size());
+      // for (const auto& filme : filmes) {
+      //     cout << "  " << filme->tituloOriginal << " (" << filme->tipoDoFilme << ")\n";
+      // }
   }
+*/
 
+  auto fimTempo = high_resolution_clock::now(); //Fim da contagem de tempoi inicializacao
+  duration<double> duracao = (fimTempo - inicioTempo);
 
-  //printVector(filmesSport);
-  // for(Cinema cinema : cinemas){
-  //   cout << "Nome cinema: " << cinema.nomeDoCinema << endl;
-  //   cout << "filmes: ";
-  //   for(Filme filme : cinema.filmes){
-  //     cout << filme.tituloOriginal << endl;
-  //   }
-  // }
   cout << "Tempo de Inicialização(segundos): " << duracao.count() << endl;
   return 0;
 }
