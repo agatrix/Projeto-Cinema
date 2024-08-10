@@ -233,7 +233,7 @@ void printVector(vector<Filme*>& filmes){
 }
 
 // Função para realizar a busca binária no vector de FILMES
-int buscaBinariaFilmes(const vector<Filme*>& filmes, int valor_procurado) {
+int buscaBinariaFilmes(const vector<Filme*>& filmes, long valor_procurado) {
     int esquerda = 0;
     int direita = filmes.size() - 1;
 
@@ -257,7 +257,7 @@ int buscaBinariaFilmes(const vector<Filme*>& filmes, int valor_procurado) {
     return -1;
 }
 
-int buscaBinariaInt(const vector<int>& valor, int valor_procurado) {
+int buscaBinariaInt(const vector<int>& valor, long valor_procurado) {
     int esquerda = 0;
     int direita = valor.size() - 1;
 
@@ -281,39 +281,45 @@ int buscaBinariaInt(const vector<int>& valor, int valor_procurado) {
     return -1;
 }
 
-void verificarRepeticao(vector<Filme*>& solucao,Filme* filme, int id){
-  if(solucao.empty()){
-    solucao.push_back(filme);
-    return;
-  }
+// void verificarRepeticao(vector<Filme*>& solucao,Filme* filme){
+//   if(solucao.empty()){
+//     solucao.push_back(filme);
+//     return;
+//   }
 
-  if(buscaBinariaFilmes(solucao,id)==-1){
-    solucao.push_back(filme);
-  }
-}
+//   for(auto x : solucao){
+//     if(x->idFilme==filme->idFilme)
+//       return;
+//   }
+//   solucao.push_back(filme);
+// }
 
 void filtrarOU (vector<Filme*>& filmes1, vector<Filme*>& filmes2, vector<Filme*>& solucao){
   for(auto filme : filmes1){
-    verificarRepeticao(solucao,filme,filme->idFilme);
+    if(solucao != filmes1)
+      solucao.push_back(filme);
   }
   for(int j = 0; j<filmes2.size();j++){
     int indice = buscaBinariaFilmes(filmes1,filmes2[j]->idFilme);
-    if(indice == -1)
-      verificarRepeticao(solucao,filmes2[j],filmes2[j]->idFilme);
+    if(indice == -1){
+      if(filmes2 != solucao)
+        solucao.push_back(filmes2[j]);
+    }
   }
 }
 
 void filtrarE(vector<Filme*>& filmes1, vector<Filme*>& filmes2, vector<Filme*>& solucao){
   for(int j = 0; j<filmes2.size();j++){
     int indice = buscaBinariaFilmes(filmes1,filmes2[j]->idFilme);
-    if(indice != -1)
-      verificarRepeticao(solucao,filmes2[j],filmes2[j]->idFilme);
+    if(indice != -1){
+      if(filmes2 != solucao)
+        solucao.push_back(filmes2[j]);
+    }
   }
 
 }
 
 void filtrar(vector<Filme*>& filmes1, vector<Filme*>& filmes2, vector<Filme*>& solucao, int operador, vector<int>& opcoes){
-  
   if(operador==0){ //operador == 0 "OU"
     if(filmes1.size() >= filmes2.size()){
       filtrarOU(filmes1,filmes2,solucao);
@@ -381,11 +387,12 @@ int main() {
 
   vector<vector<Filme*>> matrizGenero; //Cria uma matriz onde cada linha possui filmes um genero
   vector<vector<Filme*>> matrizDuracao;
+  vector<vector<Filme*>> matrizTipo;
 
   vector<int> tamanhoGenero; //Pega o tamanho de cada linha, ou seja, a quantidade de filmes daquele genero
   vector<int> tamanhoDuracao;
 
-  vector<int> opcoesGenero = {0,2};
+  vector<int> opcoesGenero = {0,1,2};
 
   for(Filme filme : filmes){
     separarTipos(filme.genero, generos); //Separa os filmes Generos
@@ -412,6 +419,10 @@ int main() {
     matrizGenero.push_back(geraVectorGenero(filmes,genero));
   }
 
+  for(string tipo : tiposFilme){ //Cria matriz de tipos de filme
+    matrizTipo.push_back(geraVectorTipo(filmes,tipo));
+  }
+
   for(int duracoes : duracoesFilme){ //Cria matriz de duracao
     matrizDuracao.push_back(geraVectorDuracao(filmes,duracoes));
   }
@@ -429,29 +440,31 @@ int main() {
   //INICIO FILTRAGEM
   auto inicioTempoFiltro = high_resolution_clock::now(); //Inicio contagem de tempo inicializacao
 
-  int indice = buscaBinariaInt(duracoesFilme, 1);
+  // for(int i = 0; i < duracoesFilme.size(); i++){
+  //   if(matrizDuracao[i][0]->duracao>10)
+  //     break;
 
-  for(int i = 0; i < duracoesFilme.size(); i++){
-    if(matrizDuracao[i][0]->duracao>10)
-      break;
+  //   if(matrizDuracao[i][0]->duracao>=0 && matrizDuracao[i][0]->duracao<=1){
+  //     for(auto x:matrizDuracao[i]){
+  //       //cout << x->tituloOriginal << " ";
+  //     }
+  //     //cout << endl;
+  //   }
+  // }
 
-    if(matrizDuracao[i][0]->duracao>=0 && matrizDuracao[i][0]->duracao<=1){
-      for(auto x:matrizDuracao[i]){
-        //cout << x->tituloOriginal << " ";
-      }
-      //cout << endl;
-    }
+  vector<Filme*> solucaoTipo;
+  vector<Filme*> solucaoGenero;
+
+  filtrar(matrizTipo[opcoesGenero[0]],matrizTipo[opcoesGenero[1]],solucaoTipo,0,opcoesGenero);
+  filtrar(matrizGenero[0],matrizGenero[opcoesGenero[2]],solucaoGenero,1,opcoesGenero);
+  filtrar(solucaoGenero,matrizGenero[opcoesGenero[1]],solucaoGenero,1,opcoesGenero);
+  //filtrar(matrizTipo[opcoesGenero[0]],matrizTipo[opcoesGenero[1]],solucao,0,opcoesGenero);
+  for(auto x : tiposFilme){
+    cout << x << endl;
   }
-
-  vector<Filme*> solucao;
-
-  filtrar(matrizGenero[opcoesGenero[0]],matrizGenero[opcoesGenero[1]],solucao,1,opcoesGenero);
-  filtrar(matrizGenero[opcoesGenero[0]],matrizGenero[opcoesGenero[1]],solucao,1,opcoesGenero);
-
-  for(auto x:solucao){
-    cout << x->tituloOriginal << endl;
+  for(auto x:solucaoGenero){
+    cout << x->tituloOriginal << " " << x->idFilme << endl;
   }
-
   auto fimTempoFiltro = high_resolution_clock::now(); //Fim da contagem de tempoi inicializacao
   duration<double> duracaoFiltro = (fimTempoFiltro - inicioTempoFiltro);
 
