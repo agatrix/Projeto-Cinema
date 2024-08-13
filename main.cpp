@@ -1,12 +1,10 @@
 #include <fstream>
 #include <iostream>
-#include <list>
 #include <sstream>
 #include <string>
 #include <vector>
 #include <chrono> // Para medições de tempo
 #include <set> //Utilizar o set, para unificar
-//#include <map> //Utilização de map
 
 using namespace std;
 using namespace chrono; // contagem de tempo
@@ -201,20 +199,52 @@ vector<Filme> geraVectorTipo(vector<Filme>& filmes, string tipo){
   return vectorTipo;
 } 
 
-vector<Filme*> geraVectorDuracao(vector<Filme>& filmes, int duracao){
-  vector<Filme*> vectorDuracao;
+vector<Filme> geraVectorDuracao(vector<Filme>& filmes, int duracao){
+  vector<Filme> vectorDuracao;
   string palavra;
 
   for(int i=0;i<filmes.size();i++){
     stringstream ss(to_string(filmes[i].duracao)); 
     while (getline(ss, palavra)) {
       if(palavra == to_string(duracao))
-      vectorDuracao.push_back((&filmes[i]));
+      vectorDuracao.push_back((filmes[i]));
     }
     
   }
 
   return vectorDuracao;
+} 
+
+vector<Filme> geraVectorAno(vector<Filme>& filmes, int ano){
+  vector<Filme> vectorano;
+  string palavra;
+
+  for(int i=0;i<filmes.size();i++){
+    stringstream ss(to_string(filmes[i].anoLancamento)); 
+    while (getline(ss, palavra)) {
+      if(palavra == to_string(ano))
+      vectorano.push_back((filmes[i]));
+    }
+    
+  }
+
+  return vectorano;
+} 
+
+vector<Cinema> geraVectorPreco(vector<Cinema>& cinemas, int preco){
+  vector<Cinema> vectorPreco;
+  string palavra;
+
+  for(int i=0;i<cinemas.size();i++){
+    stringstream ss(to_string(int((cinemas[i].preco)*100))); 
+    while (getline(ss, palavra)) {
+      if(palavra == to_string(preco))
+      vectorPreco.push_back((cinemas[i]));
+    }
+    
+  }
+
+  return vectorPreco;
 } 
 
 void separarTipos(const string& str, set<string>& set_) {
@@ -223,6 +253,46 @@ void separarTipos(const string& str, set<string>& set_) {
     while (getline(ss, item, ',')) {
         set_.insert(item);
     }
+}
+
+
+// Função para trocar dois elementos
+void swap(vector<int>& vetorD, int i, int j) {
+    int temp = vetorD[i];
+    vetorD[i] = vetorD[j];
+    vetorD[j] = temp;
+}
+
+// Função para particionar o vetor
+int particionar(vector<int>& vec, int baixo, int alto) {
+    int pivo = vec[alto];  // Escolhe o último elemento como pivô
+    int i = baixo - 1;     // Índice do menor elemento
+
+    for (int j = baixo; j < alto; ++j) {
+        if (vec[j] < pivo) {
+            ++i;
+            swap(vec, i, j);
+        }
+    }
+
+    swap(vec, i + 1, alto);
+    return i + 1; // Retorna o índice do pivô
+}
+
+// Função recursiva para aplicar QuickSort
+void quickSort(vector<int>& vec, int baixo, int alto) {
+    if (baixo < alto) {
+        int pivoIndex = particionar(vec, baixo, alto);  // Particiona o vetor
+
+        // Ordena as duas metades separadamente
+        quickSort(vec, baixo, pivoIndex - 1);
+        quickSort(vec, pivoIndex + 1, alto);
+    }
+}
+
+// Função auxiliar para iniciar o QuickSort
+void quickSort(vector<int>& vec) {
+    quickSort(vec, 0, vec.size() - 1);
 }
 
 void merge(vector<Filme>& filmes, int esquerda,int meio,int direita){
@@ -269,6 +339,7 @@ void merge(vector<Filme>& filmes, int esquerda,int meio,int direita){
   }
  
 }
+
 //Função para printar os vectors de filmes
 void printVector(vector<Filme*>& filmes){
   for(Filme* filme : filmes){
@@ -349,7 +420,31 @@ void filtrarE(vector<Filme> &filmes1, vector<Filme> &filmes2, vector<Filme>& sol
   
 }
 
-void filtrar(vector<Filme> &filmes1, vector<Filme> &filmes2, vector<Filme>& solucao,int operador){
+void filtrarDuracao(vector<Filme>& filme,vector<Filme>& solucao,int limiteInf, int limiteSup){
+  solucao.clear();
+  for(int i = 0; i < filme.size(); i++){
+    if(filme[i].duracao>limiteSup)
+      return;
+
+    if(filme[i].duracao>=limiteInf && filme[i].duracao<=limiteSup){
+      solucao.push_back(filme[i]);
+    }
+  }
+}
+
+void filtrarAno(vector<Filme>& filme,vector<Filme>& solucao,int limiteInf, int limiteSup){
+  solucao.clear();
+  for(int i = 0; i < filme.size(); i++){
+    if(filme[i].anoLancamento>limiteSup)
+      return;
+
+    if(filme[i].anoLancamento>=limiteInf && filme[i].anoLancamento<=limiteSup){
+      solucao.push_back(filme[i]);
+    }
+  }
+}
+
+void filtrarFilme(vector<Filme> &filmes1, vector<Filme> &filmes2, vector<Filme>& solucao,int operador){
   if(operador==0){ //operador == 0 "OU"
     if(filmes1.size() >= filmes2.size()){ //Pegamos o maior vector pra trabalhar
       filtrarOU(filmes1,filmes2,solucao);
@@ -365,46 +460,16 @@ void filtrar(vector<Filme> &filmes1, vector<Filme> &filmes2, vector<Filme>& solu
   }
 
 }
-
-
-// Função para trocar dois elementos
-void swap(vector<int>& vetorD, int i, int j) {
-    int temp = vetorD[i];
-    vetorD[i] = vetorD[j];
-    vetorD[j] = temp;
-}
-
-// Função para particionar o vetor
-int particionar(vector<int>& vec, int baixo, int alto) {
-    int pivo = vec[alto];  // Escolhe o último elemento como pivô
-    int i = baixo - 1;     // Índice do menor elemento
-
-    for (int j = baixo; j < alto; ++j) {
-        if (vec[j] < pivo) {
-            ++i;
-            swap(vec, i, j);
-        }
+void filtrarPrecoCinema(vector<vector<Cinema>> &cinemas, vector<Cinema> &solucao, int indice){
+  solucao.clear();
+  
+  for(int i = 0; i <= indice; i++){
+    for(auto x : cinemas[i]){
+      solucao.push_back(x);
     }
-
-    swap(vec, i + 1, alto);
-    return i + 1; // Retorna o índice do pivô
+  }
 }
 
-// Função recursiva para aplicar QuickSort
-void quickSort(vector<int>& vec, int baixo, int alto) {
-    if (baixo < alto) {
-        int pivoIndex = particionar(vec, baixo, alto);  // Particiona o vetor
-
-        // Ordena as duas metades separadamente
-        quickSort(vec, baixo, pivoIndex - 1);
-        quickSort(vec, pivoIndex + 1, alto);
-    }
-}
-
-// Função auxiliar para iniciar o QuickSort
-void quickSort(vector<int>& vec) {
-    quickSort(vec, 0, vec.size() - 1);
-}
 
 int main() {
   auto inicioTempo = high_resolution_clock::now(); //Inicio contagem de tempo inicializacao
@@ -414,18 +479,17 @@ int main() {
 
   set<string> generos;    //O set permite a unificação dos elementos
   set<string> tiposFilme; 
-  set<string> duracaosFilmes;
-  set<string> anoFilme;
+  set<string> duracaoFilmeSet;
+  set<string> anoFilmeSet;
+  set<string> precoCinemaSet;
 
   vector<vector<Filme>> matrizGenero; //Cria uma matriz onde cada linha possui filmes um genero
-  vector<vector<Filme*>> matrizDuracao;
+  vector<vector<Filme>> matrizDuracao;
   vector<vector<Filme>> matrizTipo;
+  vector<vector<Filme>> matrizAno;
+  vector<vector<Cinema>> matrizPreco;
 
-  vector<int> tamanhoGenero; //Pega o tamanho de cada linha, ou seja, a quantidade de filmes daquele genero
-  vector<int> tamanhoDuracao;
-
-  vector<int> opcoesGenero = {0,1,2};
-
+  //SEPARACAO DE INFORMACOES DAS COLUNAS
   for(Filme filme : filmes){
     separarTipos(filme.genero, generos); //Separa os filmes Generos
   }
@@ -435,18 +499,45 @@ int main() {
   }
 
   for(Filme filme : filmes){
-    separarTipos(to_string(filme.duracao), duracaosFilmes); //Separa os filmes por Duracao
+    separarTipos(to_string(filme.duracao), duracaoFilmeSet); //Separa os filmes por Duracao
+  }
+
+  for(Filme filme : filmes){
+    separarTipos(to_string(filme.anoLancamento), anoFilmeSet); //Separa os filmes por Ano
+  }
+
+  for(Cinema cinema : cinemas){
+    separarTipos(to_string(cinema.preco*100), precoCinemaSet); //Separa os cinemas por Preco
   }
 
   //Criacao do vector de duracao
-  vector<int> duracoesFilme;
-  for(auto x : duracaosFilmes){
+  vector<int> duracaoFilme;
+  for(auto x : duracaoFilmeSet){
     if(stoi(x) != 0)
-      duracoesFilme.push_back(stoi(x));
+      duracaoFilme.push_back(stoi(x));
   }
-  duracaosFilmes.clear(); //Limpamos o set para limpar memoria
-  quickSort(duracoesFilme);
+  duracaoFilmeSet.clear(); //Limpamos o set para limpar memoria
+  quickSort(duracaoFilme);
 
+  //Criacao do vector de ano
+  vector<int> anoFilme;
+  for(auto x : anoFilmeSet){
+    if(stoi(x) != 0)
+      anoFilme.push_back(stoi(x));
+  }
+  anoFilmeSet.clear(); //Limpamos o set para limpar memoria
+  quickSort(anoFilme);
+
+  //Criacao do vector de ano
+  vector<int> precoCinema;
+  for(auto x : precoCinemaSet){
+    if(stoi(x) != 0)
+      precoCinema.push_back(stoi(x));
+  }
+  precoCinemaSet.clear(); //Limpamos o set para limpar memoria
+  quickSort(precoCinema);
+
+  //CRIAÇAO DE MATRIZES
   for(string genero : generos){ //Cria matriz de generos
     matrizGenero.push_back(geraVectorGenero(filmes,genero));
   }
@@ -455,12 +546,16 @@ int main() {
     matrizTipo.push_back(geraVectorTipo(filmes,tipo));
   }
 
-  for(int duracoes : duracoesFilme){ //Cria matriz de duracao
+  for(int duracoes : duracaoFilme){ //Cria matriz de duracao
     matrizDuracao.push_back(geraVectorDuracao(filmes,duracoes));
   }
 
-  for(auto x : matrizGenero){ //Repeticao para pegar a quantiadade de filmes por generos 
-    tamanhoGenero.push_back(x.size());
+  for(int ano : anoFilme){ //Cria matriz de duracao
+    matrizAno.push_back(geraVectorAno(filmes,ano));
+  }
+
+  for(int preco : precoCinema){ //Cria matriz de duracao
+    matrizPreco.push_back(geraVectorPreco(cinemas,preco));
   }
 
   auto fimTempo = high_resolution_clock::now(); //Fim da contagem de tempoi inicializacao
@@ -472,37 +567,21 @@ int main() {
   //INICIO FILTRAGEM
   auto inicioTempoFiltro = high_resolution_clock::now(); //Inicio contagem de tempo inicializacao
 
-  // for(int i = 0; i < duracoesFilme.size(); i++){
-  //   if(matrizDuracao[i][0]->duracao>10)
-  //     break;
-
-  //   if(matrizDuracao[i][0]->duracao>=0 && matrizDuracao[i][0]->duracao<=1){
-  //     for(auto x:matrizDuracao[i]){
-  //       //cout << x->tituloOriginal << " ";
-  //     }
-  //     //cout << endl;
-  //   }
-  // }
-
   vector<Filme> solucaoTipo;
   vector<Filme> solucaoGenero;
-  vector<Filme> aux1,aux2,aux3;
+  vector<Cinema> solucaoCinema;
   vector<int> opcaoGenero;
   vector<int> opcaoTipo;
 
+  // filtrarFilme(matrizGenero[0],matrizGenero[5],solucaoGenero,0);
+  // filtrarAno(solucaoGenero,solucaoTipo,2010,2018);
 
+  filtrarPrecoCinema(matrizPreco,solucaoCinema,buscaBinariaInt(precoCinema,(12.5)*100));
 
-  
-
-  //filtrarOU(aux1,aux2,solucaoGenero);
-  filtrar(matrizGenero[0],matrizGenero[5],solucaoGenero,0);
-  //filtrar(solucaoGenero,matrizTipo[2],solucaoGenero,0);
-  //filtrarE(solucaoGenero,aux3,solucaoGenero);
-  for(auto x : solucaoGenero){
-    cout << x.idFilme << " " << x.tituloOriginal << endl;
+  for(auto x : solucaoCinema){
+    cout << x.id << " " << x.nomeDoCinema << endl;
   }
-  //filtrarOU(aux1,aux2,solucaoGenero);
-  //filtrar(solucaoGenero,(aux3),solucaoGenero,1);
+
 
   
   auto fimTempoFiltro = high_resolution_clock::now(); //Fim da contagem de tempoi inicializacao
