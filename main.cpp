@@ -6,7 +6,7 @@
 #include <vector>
 #include <chrono> // Para medições de tempo
 #include <set> //Utilizar o set, para unificar
-#include <map> //Utilização de map
+//#include <map> //Utilização de map
 
 using namespace std;
 using namespace chrono; // contagem de tempo
@@ -225,6 +225,50 @@ void separarTipos(const string& str, set<string>& set_) {
     }
 }
 
+void merge(vector<Filme>& filmes, int esquerda,int meio,int direita){
+  int valor1 = meio - esquerda + 1;//tamanho da primeira metade
+  int valor2 = direita - meio;//tamanho da segunda metade
+
+  vector<Filme> vectorEsquerda;
+  vector<Filme> vectorDireita;
+
+//copia os dados para vetores temporarios
+
+  for(int i = 0;i<valor1;i++){
+    vectorEsquerda.push_back(filmes[esquerda + i]);
+  }
+  for(int j = 0;j<valor2;j++){
+    vectorDireita.push_back(filmes[meio + 1 +j]);
+  }
+
+//mesclar os vetores n original ordenando
+  int i =0;int j= 0;int k = esquerda;
+  while(i< valor1 && j < valor2){
+    if(vectorEsquerda[i].idFilme < vectorDireita[j].idFilme){
+      filmes[k] = vectorEsquerda[i];
+      i++;
+    }else{
+      filmes[k] = vectorDireita[j];
+      j++;
+    }
+    //cout << filmes[k].idFilme << endl;
+    k++;
+  }
+
+  //copiar os elementos restantes de vectorEsquerda[] caso existam
+  while(i< valor1){
+    filmes[k] = vectorEsquerda[i];
+    i++;
+    k++;
+  }
+  //copiar os elementos restantes de vectorDireita[] caso existam
+  while(j< valor2){
+    filmes[k] = vectorDireita[j];
+    j++;
+    k++;
+  }
+ 
+}
 //Função para printar os vectors de filmes
 void printVector(vector<Filme*>& filmes){
   for(Filme* filme : filmes){
@@ -347,6 +391,10 @@ void filtrarOU(vector<Filme> filme1,vector<Filme> filme2,vector<Filme> &solucao)
         solucao.push_back(filme2[j]);
     }
   }
+  //cout << "aqui"<<endl;
+  merge(solucao,0,filme1.size()-1,solucao.size()-1);
+  cout << solucao.size();
+
 }
 
 void filtrarE(vector<Filme> filmes1, vector<Filme> filmes2, vector<Filme>& solucao){
@@ -491,15 +539,14 @@ int main() {
     aux3.push_back(*x);
   }
 
-
+  //filtrarOU(aux1,aux2,solucaoGenero);
   filtrarE(aux1,aux2,solucaoGenero);
-  filtrarE(solucaoGenero,aux3,solucaoGenero);
+  //filtrarE(solucaoGenero,aux3,solucaoGenero);
   
-  // filtrarOU(aux1,aux2,solucaoGenero);
-  // filtrarOU(solucaoGenero,(aux3),solucaoGenero);
-
+  //filtrarOU(aux1,aux2,solucaoGenero);
+  filtrarOU(solucaoGenero,(aux3),solucaoGenero);
   for(auto x:solucaoGenero){
-    cout << x.tituloOriginal << endl;
+    cout<< "("<< x.idFilme <<")"<<x.tituloOriginal <<endl;
   }
 
   // filtrar(matrizTipo[opcoesGenero[0]],matrizTipo[opcoesGenero[1]],solucaoTipo,0,opcoesGenero);
