@@ -53,7 +53,7 @@ long removeLetraID(string id){
 }
 
 vector<Filme> lerArquivoFilme(){
-  ifstream arquivo("filmesCrop.txt");
+  ifstream arquivo("f.txt");
   vector<Filme> filmes;
   string linha;
   if (arquivo.is_open()) {
@@ -396,7 +396,7 @@ int buscaBinariaInt(const vector<int>& valor, long valor_procurado) {
     return -1;
 }
 
-void filtrarOU(vector<Filme> &filme1,vector<Filme> &filme2,vector<Filme> &solucao){
+void filtrarOU(vector<Filme> filme1,vector<Filme> &filme2,vector<Filme> &solucao){
   solucao.clear();
   for(auto filme : filme1){
     solucao.push_back(filme);
@@ -410,7 +410,7 @@ void filtrarOU(vector<Filme> &filme1,vector<Filme> &filme2,vector<Filme> &soluca
   merge(solucao,0,filme1.size()-1,solucao.size()-1);
 }
 
-void filtrarE(vector<Filme> &filmes1, vector<Filme> &filmes2, vector<Filme>& solucao){
+void filtrarE(vector<Filme> filmes1, vector<Filme> &filmes2, vector<Filme>& solucao){
   solucao.clear();
   for(int j = 0; j<filmes2.size();j++){
     if(buscaBinariaFilmes(filmes1,filmes2[j].idFilme) != -1){
@@ -420,7 +420,7 @@ void filtrarE(vector<Filme> &filmes1, vector<Filme> &filmes2, vector<Filme>& sol
   
 }
 
-void filtrarDuracao(vector<Filme>& filme,vector<Filme>& solucao,int limiteInf, int limiteSup){
+void filtrarDuracao(vector<Filme> filme,vector<Filme>& solucao,int limiteInf, int limiteSup){
   solucao.clear();
   for(int i = 0; i < filme.size(); i++){
     if(filme[i].duracao>limiteSup)
@@ -444,6 +444,147 @@ void filtrarAno(vector<Filme>& filme,vector<Filme>& solucao,int limiteInf, int l
   }
 }
 
+
+void listageneros(){
+    cout << "(0)Action (1)Adult (2)Adventure (3)Animation" << endl;
+    cout << "(4)Biography (5)Comedy (6)Crime (7)Documentary (8)Drama" << endl;
+    cout << "(9)Family (10)Fantasy (11)Game-Show (12)History (13)Horror" << endl;
+    cout << "(14)Music (15)Musical (16)Mystery (17)NULL (18)News" <<endl;
+    cout << "(19)Reality-TV (20)Romance (21)Sci-Fi (22)Short (23)Sport" << endl;
+    cout << "(24)Talk-Show (25)Thriller (26)War (27)Western" << endl;
+}
+
+void listaTipo(){
+  cout << "(0)movie (1)short (2)tvEpisode (3)tvMiniSeries (4)tvMovie" << endl;
+  cout << "(5)tvSeries (6)tvShort (7)tvSpecial (8)video (9)videoGame" << endl;
+}
+
+void filtrarPorGenero(vector<Filme>&solucao,vector<vector<Filme>>& matrizGenero,int juntar) {
+  int genero, outroGenero, tipoFiltro,segundoGenero; 
+  listageneros();
+  cin >> genero;
+  cout << "Deseja filtrar por outro gênero? (1-Sim, 0-Não): ";
+  cin >> outroGenero;
+  if(outroGenero==1){      
+    cout << "Deseja aplicar filtro AND ou OR? (0-AND, 1-OR): ";
+    cin >> tipoFiltro;
+    listageneros();
+    cin >> segundoGenero;
+    if(tipoFiltro==1){
+      filtrarOU(matrizGenero[genero],matrizGenero[segundoGenero],solucao);
+    }else{
+      filtrarE(matrizGenero[genero],matrizGenero[segundoGenero],solucao);
+    }
+    cout << "Deseja filtrar por outro gênero? (1-Sim, 0-Não): ";
+    cin >> outroGenero;
+    while (outroGenero ==1){
+      cout << "Deseja aplicar filtro AND ou OR? (0-AND, 1-OR): ";
+      cin >> tipoFiltro;
+      listageneros();
+      cin >> segundoGenero;
+      if(tipoFiltro==1){
+        filtrarOU(solucao,matrizGenero[segundoGenero],solucao);
+      }else{
+        filtrarE(solucao,matrizGenero[segundoGenero],solucao);
+      }
+      cout << "Deseja filtrar por outro gênero? (1-Sim, 0-Não): ";
+      cin >> outroGenero; 
+    }
+  }else{
+    if(juntar == 1)
+      filtrarOU(solucao,matrizGenero[genero],solucao);
+    else
+      filtrarE(solucao,matrizGenero[genero],solucao);
+  }
+}
+
+void filtrarPorTipo(vector<Filme>&solucao,vector<vector<Filme>>& matrizTipo,int juntar) {
+  int tipo, outroTipo, tipoFiltro,segundoTipo; 
+  listaTipo();
+  cin >> tipo;
+  cout << "Deseja filtrar por outro tipo? (1-Sim, 0-Não): ";
+  cin >> outroTipo;
+  if(outroTipo==1){      
+    cout << "Deseja aplicar filtro AND ou OR? (0-AND, 1-OR): ";
+    cin >> tipoFiltro;
+    listaTipo();
+    cin >> segundoTipo;
+    if(tipoFiltro==1){
+      filtrarOU(matrizTipo[tipo],matrizTipo[segundoTipo],solucao);
+    }else{
+      filtrarE(matrizTipo[tipo],matrizTipo[segundoTipo],solucao);
+    }
+    cout << "Deseja filtrar por outro gênero? (1-Sim, 0-Não): ";
+    cin >> outroTipo;
+    while (outroTipo ==1){
+      cout << "Deseja aplicar filtro AND ou OR? (0-AND, 1-OR): ";
+      cin >> tipoFiltro;
+      listaTipo();
+      cin >> segundoTipo;
+      if(tipoFiltro==1){
+        /* for(auto x : solucao)
+          cout << x.tituloOriginal<<endl; */
+        filtrarOU(solucao,matrizTipo[segundoTipo],solucao);
+      }else{
+        filtrarE(solucao,matrizTipo[segundoTipo],solucao);
+      }
+      cout << "Deseja filtrar por outro gênero? (1-Sim, 0-Não): ";
+      cin >> outroTipo; 
+    }
+  }else{
+    if(juntar == 1)
+      filtrarOU(solucao,matrizTipo[tipo],solucao);
+    else
+      filtrarE(solucao,matrizTipo[tipo],solucao);
+  }
+}
+
+void filtrarPorDuracao(vector<Filme>&solucao, vector<Filme>&filmes,int juntar){
+  int limiteInferior,limiteSuperior;
+  vector<Filme> temp; //vector temporario
+  cout << "Digite o intervalo de tempo do filme(em minutos):\n" << endl;
+  cin >> limiteInferior;
+  cin >> limiteSuperior;
+  
+  if(juntar == 1){
+    filtrarDuracao(filmes,temp,limiteInferior,limiteSuperior);
+    filtrarOU(solucao,temp,solucao);
+    temp.clear();
+  }else{
+    filtrarDuracao(solucao,solucao,limiteInferior,limiteSuperior);
+  }
+}
+
+void filtrarPorAno(vector<Filme>&solucao, vector<Filme>&filmes,int juntar){
+  int limiteInferior,limiteSuperior, escolha;
+  vector<Filme> temp;
+  cout << "(0)Buscar Ano Especifico\n(1)Buscar Intervalo" << endl;
+  cin >> escolha;
+  if(escolha == 1){
+    cout << "Digite o intervalo de ano:" << endl;
+    cin >> limiteInferior;
+    cin >> limiteSuperior;
+    
+    if(juntar == 1){
+      filtrarAno(filmes,temp,limiteInferior,limiteSuperior);
+      filtrarOU(solucao,temp,solucao);
+      temp.clear();
+    }else{
+      filtrarAno(solucao,solucao,limiteInferior,limiteSuperior);
+    }
+  }else{
+    cout << "Digite o ano:" << endl;
+    cin >> limiteInferior;
+    if(juntar == 1){
+      filtrarAno(filmes,temp,limiteInferior,limiteInferior);
+      filtrarOU(solucao,temp,solucao);
+      temp.clear();
+    }else{
+      filtrarAno(solucao,solucao,limiteInferior,limiteInferior);
+    }
+  }
+}
+
 void filtrarFilme(vector<Filme> &filmes1, vector<Filme> &filmes2, vector<Filme>& solucao,int operador){
   if(operador==0){ //operador == 0 "OU"
     if(filmes1.size() >= filmes2.size()){ //Pegamos o maior vector pra trabalhar
@@ -460,6 +601,10 @@ void filtrarFilme(vector<Filme> &filmes1, vector<Filme> &filmes2, vector<Filme>&
   }
 
 }
+
+
+
+//FILTRAGEM DE CINEMA
 void filtrarPrecoCinema(vector<vector<Cinema>> &cinemas, vector<Cinema> &solucao, int indice){
   solucao.clear();
   
@@ -497,7 +642,9 @@ int main() {
   for(Filme filme : filmes){
     separarTipos(filme.tipoDoFilme, tiposFilme); //Separa os filmes por Tipo
   }
-
+  for(auto x : tiposFilme){
+    cout<<x<< " ";
+  }
   for(Filme filme : filmes){
     separarTipos(to_string(filme.duracao), duracaoFilmeSet); //Separa os filmes por Duracao
   }
@@ -545,7 +692,7 @@ int main() {
   for(string tipo : tiposFilme){ //Cria matriz de tipos de filme
     matrizTipo.push_back(geraVectorTipo(filmes,tipo));
   }
-
+ 
   for(int duracoes : duracaoFilme){ //Cria matriz de duracao
     matrizDuracao.push_back(geraVectorDuracao(filmes,duracoes));
   }
@@ -567,19 +714,55 @@ int main() {
   //INICIO FILTRAGEM
   auto inicioTempoFiltro = high_resolution_clock::now(); //Inicio contagem de tempo inicializacao
 
-  vector<Filme> solucaoTipo;
-  vector<Filme> solucaoGenero;
+  vector<Filme> solucao;
   vector<Cinema> solucaoCinema;
   vector<int> opcaoGenero;
   vector<int> opcaoTipo;
 
   // filtrarFilme(matrizGenero[0],matrizGenero[5],solucaoGenero,0);
-  // filtrarAno(solucaoGenero,solucaoTipo,2010,2018);
+  //filtrarAno(filmes,solucaoTipo,2010,2018);
+  //filtrarPrecoCinema(matrizPreco,solucaoCinema,buscaBinariaInt(precoCinema,(12.5)*100));
 
-  filtrarPrecoCinema(matrizPreco,solucaoCinema,buscaBinariaInt(precoCinema,(12.5)*100));
+  int escolha1;
+  int escolhaFiltro,escolhaGenero,outroFIltro;
+  int juntaFiltros=1;
+ 
+  do{
+    cout << "(1)Filmes" << endl << "(2)Cinemas" << endl << "(0)Sair" << endl;
+    cin >> escolha1;
 
-  for(auto x : solucaoCinema){
-    cout << x.id << " " << x.nomeDoCinema << endl;
+    if(escolha1 == 1){
+      cout << "(1)Genero\n(2)Tipo\n(3)Duracao\n(4)Ano" << endl;
+      cin >> escolhaFiltro;
+
+      switch (escolhaFiltro){
+        case 1:
+          filtrarPorGenero(solucao,matrizGenero,juntaFiltros);
+          break;
+        case 2:
+          filtrarPorTipo(solucao,matrizTipo,juntaFiltros);
+          break;
+        case 3:
+          filtrarPorDuracao(solucao, filmes,juntaFiltros);
+          break;
+        case 4:
+          filtrarPorAno(solucao, filmes,juntaFiltros);
+          break;
+        default:
+          break;
+      }
+      cout << "Outro FIltro? (1)Sim (0)Não" <<endl;
+      cin >> outroFIltro;
+      if(outroFIltro == 1){
+        cout << "filtrar usando (1)OR (2)AND: ";
+        cin >> juntaFiltros;
+      }  
+    }
+
+  }while(escolha1 != 0);
+
+  for(auto x : solucao){
+    cout << "("<<x.genero<<")"<< "("<<x.tipoDoFilme<<")"<< "("<<x.duracao<<")"<<x.idFilme <<endl; 
   }
 
 
