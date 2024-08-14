@@ -53,7 +53,7 @@ int removeLetraID(string id){
 }
 
 vector<Filme> lerArquivoFilme(){
-  ifstream arquivo("filmesCrop.txt");
+  ifstream arquivo("f.txt");
   vector<Filme> filmes;
   string linha;
   if (arquivo.is_open()) {
@@ -693,7 +693,7 @@ void filtrarPrecoCinema(vector<vector<Cinema>> &cinemas, vector<Cinema> &solucao
       }
     }
   }
-  if(indice == -1){
+  if(indice == -1 && (valor)*100-precoCinema[51] > 0){
    indice = 51; 
   }
   for(int i = 0; i <= indice; i++){
@@ -843,7 +843,7 @@ int main() {
       }
     }
     if(escolha1 == 2){
-      cout << "(1)Genero\n(2)Tipo\n(3)Duracao\n(4)Ano\n(5)Filme" << endl;
+      cout << "(1)Genero\n(2)Tipo\n(3)Duracao\n(4)Ano\n(5)Preco" << endl;
       cin >> escolhaFiltro;
 
       switch (escolhaFiltro){
