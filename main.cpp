@@ -12,6 +12,7 @@ using namespace chrono; // contagem de tempo
 class Filme {
 public:
   int idFilme;
+  int idFilmeArt;
   string tipoDoFilme;
   string tituloPrimario;
   string tituloOriginal;
@@ -22,9 +23,9 @@ public:
   string genero;
 
   //Contrutor Sobrecarregado
-  Filme(int idFilme, const string& tipoDoFilme, const string& tituloPrimario, const string& tituloOriginal,
+  Filme(int idFilme, int idFilmeArt, const string& tipoDoFilme, const string& tituloPrimario, const string& tituloOriginal,
   bool isAdult, int anoLancamento, int anoTermino, int duracao, const string& genero)
-: idFilme(idFilme), tipoDoFilme(tipoDoFilme), tituloPrimario(tituloPrimario), tituloOriginal(tituloOriginal),
+: idFilme(idFilme), idFilmeArt(idFilmeArt), tipoDoFilme(tipoDoFilme), tituloPrimario(tituloPrimario), tituloOriginal(tituloOriginal),
   isAdult(isAdult), anoLancamento(anoLancamento), anoTermino(anoTermino), duracao(duracao), genero(genero) {}
 };
 
@@ -53,16 +54,16 @@ int removeLetraID(string id){
 }
 
 vector<Filme> lerArquivoFilme(){
-  ifstream arquivo("f.txt");
+  ifstream arquivo("filmesCrop.txt");
   vector<Filme> filmes;
   string linha;
   if (arquivo.is_open()) {
     getline(arquivo, linha);
-
+    int i = 0;
     while (getline(arquivo, linha)) {
       istringstream ss(linha);
       string ids, tipo, tituloPrimario, tituloOriginal, isAdultStr, anoLancamentoStr,anoTerminoStr,duracaoStr,genero;
-
+      
       getline(ss, ids, '\t');
       getline(ss, tipo, '\t');
       getline(ss, tituloPrimario, '\t');
@@ -82,7 +83,8 @@ vector<Filme> lerArquivoFilme(){
           genero = "NULL";
         }
         int idint = (!ids.empty()) ? removeLetraID(ids):0;
-        Filme filme(idint, tipo, tituloPrimario, tituloOriginal, isAdult, anoLancamento, anoTermino, duracao, genero);
+        int idArt = i;
+        Filme filme(idint, idArt, tipo, tituloPrimario, tituloOriginal, isAdult, anoLancamento, anoTermino, duracao, genero);
               
         filmes.push_back(filme);
       } catch (const invalid_argument& e) {
@@ -90,6 +92,7 @@ vector<Filme> lerArquivoFilme(){
       } catch (const out_of_range& e) {
           cerr << "Erro de conversão: valor fora do intervalo para ano de lançamento, ano de término ou duração" << endl;
       }
+      i++;
     }
     arquivo.close();
   }else {
@@ -338,13 +341,6 @@ void merge(vector<Filme>& filmes, int esquerda,int meio,int direita){
     k++;
   }
  
-}
-
-//Função para printar os vectors de filmes
-void printVector(vector<Filme*>& filmes){
-  for(Filme* filme : filmes){
-    cout << filme->tituloOriginal << endl;
-  }
 }
 
 // Função para realizar a busca binária no vector de FILMES
@@ -660,25 +656,6 @@ void filtrarPorAno(vector<Filme>&solucao, vector<vector<Filme>>&filmes,int junta
   }
 }
 
-// void filtrarFilme(vector<Filme> &filmes1, vector<Filme> &filmes2, vector<Filme>& solucao,int operador){
-//   if(operador==0){ //operador == 0 "OU"
-//     if(filmes1.size() >= filmes2.size()){ //Pegamos o maior vector pra trabalhar
-//       filtrarOU(filmes1,filmes2,solucao);
-//     }else{
-//       filtrarOU(filmes2,filmes1,solucao);
-//     }
-//   }else{            //operador == 1 "E"
-//     if(filmes1.size() >= filmes2.size()){ //Pegamos o menor vector pra trabalhar em cima
-//       filtrarE(filmes2,filmes1,solucao);
-//     }else{
-//       filtrarE(filmes1,filmes2,solucao);
-//     }
-//   }
-
-// }
-
-
-
 //FILTRAGEM DE CINEMA
 void filtrarPrecoCinema(vector<vector<Cinema>> &cinemas, vector<Cinema> &solucao, vector<int> precoCinema){ 
   int valor;
@@ -723,73 +700,73 @@ int main() {
   vector<vector<Cinema>> matrizPreco;
 
   //SEPARACAO DE INFORMACOES DAS COLUNAS
-  for(Filme filme : filmes){
-    separarTipos(filme.genero, generos); //Separa os filmes Generos
-  }
+  // for(Filme filme : filmes){
+  //   separarTipos(filme.genero, generos); //Separa os filmes Generos
+  // }
 
-  for(Filme filme : filmes){
-    separarTipos(filme.tipoDoFilme, tiposFilme); //Separa os filmes por Tipo
-  }
+  // for(Filme filme : filmes){
+  //   separarTipos(filme.tipoDoFilme, tiposFilme); //Separa os filmes por Tipo
+  // }
 
-  for(Filme filme : filmes){
-    separarTipos(to_string(filme.duracao), duracaoFilmeSet); //Separa os filmes por Duracao
-  }
+  // for(Filme filme : filmes){
+  //   separarTipos(to_string(filme.duracao), duracaoFilmeSet); //Separa os filmes por Duracao
+  // }
 
-  for(Filme filme : filmes){
-    separarTipos(to_string(filme.anoLancamento), anoFilmeSet); //Separa os filmes por Ano
-  }
+  // for(Filme filme : filmes){
+  //   separarTipos(to_string(filme.anoLancamento), anoFilmeSet); //Separa os filmes por Ano
+  // }
 
-  for(Cinema cinema : cinemas){
-    separarTipos(to_string(cinema.preco*100), precoCinemaSet); //Separa os cinemas por Preco
-  }
+  // for(Cinema cinema : cinemas){
+  //   separarTipos(to_string(cinema.preco*100), precoCinemaSet); //Separa os cinemas por Preco
+  // }
 
-  //Criacao do vector de duracao
-  vector<int> duracaoFilme;
-  for(auto x : duracaoFilmeSet){
-    if(stoi(x) != 0)
-      duracaoFilme.push_back(stoi(x));
-  }
-  duracaoFilmeSet.clear(); //Limpamos o set para limpar memoria
-  quickSort(duracaoFilme);
+  // //Criacao do vector de duracao
+  // vector<int> duracaoFilme;
+  // for(auto x : duracaoFilmeSet){
+  //   if(stoi(x) != 0)
+  //     duracaoFilme.push_back(stoi(x));
+  // }
+  // duracaoFilmeSet.clear(); //Limpamos o set para limpar memoria
+  // quickSort(duracaoFilme);
 
-  //Criacao do vector de ano
-  vector<int> anoFilme;
-  for(auto x : anoFilmeSet){
-    if(stoi(x) != 0)
-      anoFilme.push_back(stoi(x));
-  }
-  anoFilmeSet.clear(); //Limpamos o set para limpar memoria
-  quickSort(anoFilme);
+  // //Criacao do vector de ano
+  // vector<int> anoFilme;
+  // for(auto x : anoFilmeSet){
+  //   if(stoi(x) != 0)
+  //     anoFilme.push_back(stoi(x));
+  // }
+  // anoFilmeSet.clear(); //Limpamos o set para limpar memoria
+  // quickSort(anoFilme);
 
-  //Criacao do vector de ano
-  vector<int> precoCinema;
-  for(auto x : precoCinemaSet){
-    if(stoi(x) != 0)
-      precoCinema.push_back(stoi(x));
-  }
-  precoCinemaSet.clear(); //Limpamos o set para limpar memoria
-  quickSort(precoCinema);
+  // //Criacao do vector de ano
+  // vector<int> precoCinema;
+  // for(auto x : precoCinemaSet){
+  //   if(stoi(x) != 0)
+  //     precoCinema.push_back(stoi(x));
+  // }
+  // precoCinemaSet.clear(); //Limpamos o set para limpar memoria
+  // quickSort(precoCinema);
 
-  //CRIAÇAO DE MATRIZES
-  for(string genero : generos){ //Cria matriz de generos
-    matrizGenero.push_back(geraVectorGenero(filmes,genero));
-  }
+  // //CRIAÇAO DE MATRIZES
+  // for(string genero : generos){ //Cria matriz de generos
+  //   matrizGenero.push_back(geraVectorGenero(filmes,genero));
+  // }
 
-  for(string tipo : tiposFilme){ //Cria matriz de tipos de filme
-    matrizTipo.push_back(geraVectorTipo(filmes,tipo));
-  }
+  // for(string tipo : tiposFilme){ //Cria matriz de tipos de filme
+  //   matrizTipo.push_back(geraVectorTipo(filmes,tipo));
+  // }
  
-  for(int duracoes : duracaoFilme){ //Cria matriz de duracao
-    matrizDuracao.push_back(geraVectorDuracao(filmes,duracoes));
-  }
+  // for(int duracoes : duracaoFilme){ //Cria matriz de duracao
+  //   matrizDuracao.push_back(geraVectorDuracao(filmes,duracoes));
+  // }
 
-  for(int ano : anoFilme){ //Cria matriz de duracao
-    matrizAno.push_back(geraVectorAno(filmes,ano));
-  }
+  // for(int ano : anoFilme){ //Cria matriz de duracao
+  //   matrizAno.push_back(geraVectorAno(filmes,ano));
+  // }
 
-  for(int preco : precoCinema){ //Cria matriz de duracao
-    matrizPreco.push_back(geraVectorPreco(cinemas,preco));
-  }
+  // for(int preco : precoCinema){ //Cria matriz de duracao
+  //   matrizPreco.push_back(geraVectorPreco(cinemas,preco));
+  // }
 
   auto fimTempo = high_resolution_clock::now(); //Fim da contagem de tempoi inicializacao
   duration<double> duracaoInit = (fimTempo - inicioTempo);
@@ -812,78 +789,90 @@ int main() {
   int juntaFiltros=1;
  
 
-  cout << "(1)Filmes" << endl << "(2)Cinemas" << endl << "(0)Sair" << endl;
-  cin >> escolha1;
-  do{
-    if(escolha1 == 1){
-      cout << "(1)Genero\n(2)Tipo\n(3)Duracao\n(4)Ano" << endl;
-      cin >> escolhaFiltro;
+  // cout << "(1)Filmes" << endl << "(2)Cinemas" << endl << "(0)Sair" << endl;
+  // cin >> escolha1;
+  // do{
+  //   if(escolha1 == 1){
+  //     cout << "(1)Genero\n(2)Tipo\n(3)Duracao\n(4)Ano" << endl;
+  //     cin >> escolhaFiltro;
 
-      switch (escolhaFiltro){
-        case 1:
-          filtrarPorGenero(solucao,matrizGenero,juntaFiltros);
-          break;
-        case 2:
-          filtrarPorTipo(solucao,matrizTipo,juntaFiltros);
-          break;
-        case 3:
-          filtrarPorDuracao(solucao, matrizDuracao,juntaFiltros);
-          break;
-        case 4:
-          filtrarPorAno(solucao, matrizAno,juntaFiltros);
-          break;
-        default:
-          break;
-      }
-      cout << "Outro FIltro? (1)Sim (0)Não" <<endl;
-      cin >> escolha1;
-      if(escolha1 == 1){
-        cout << "filtrar usando (1)OR (2)AND: ";
-        cin >> juntaFiltros;
+  //     switch (escolhaFiltro){
+  //       case 1:
+  //         filtrarPorGenero(solucao,matrizGenero,juntaFiltros);
+  //         break;
+  //       case 2:
+  //         filtrarPorTipo(solucao,matrizTipo,juntaFiltros);
+  //         break;
+  //       case 3:
+  //         filtrarPorDuracao(solucao, matrizDuracao,juntaFiltros);
+  //         break;
+  //       case 4:
+  //         filtrarPorAno(solucao, matrizAno,juntaFiltros);
+  //         break;
+  //       default:
+  //         break;
+  //     }
+  //     cout << "Outro FIltro? (1)Sim (0)Não" <<endl;
+  //     cin >> escolha1;
+  //     if(escolha1 == 1){
+  //       cout << "filtrar usando (1)OR (2)AND: ";
+  //       cin >> juntaFiltros;
+  //     }
+  //   }
+  //   if(escolha1 == 2){
+  //     cout << "(1)Genero\n(2)Tipo\n(3)Duracao\n(4)Ano\n(5)Preco" << endl;
+  //     cin >> escolhaFiltro;
+
+  //     switch (escolhaFiltro){
+  //       case 1:
+  //         filtrarPorGenero(solucao,matrizGenero,juntaFiltros);
+  //         break;
+  //       case 2:
+  //         filtrarPorTipo(solucao,matrizTipo,juntaFiltros);
+  //         break;
+  //       case 3:
+  //         filtrarPorDuracao(solucao, matrizDuracao,juntaFiltros);
+  //         break;
+  //       case 4:
+  //         filtrarPorAno(solucao, matrizAno,juntaFiltros);
+  //         break;
+  //       case 5:
+  //         filtrarPrecoCinema(matrizPreco,solucaoCinema,precoCinema);
+  //         break;
+  //       default:
+  //         break;
+  //     }
+  //     cout << "Outro FIltro? (1)Sim (0)Não" <<endl;
+  //     cin >> escolha1;
+  //     if(escolha1 == 1){
+  //       cout << "filtrar usando (1)OR (2)AND: ";
+  //       cin >> juntaFiltros;
+  //     }
+  //   }
+
+  // }while(escolha1 != 0);
+  string palavra;
+  for(auto x : cinemas){
+    for(auto y : x.filmes){
+      stringstream ss(y.genero); 
+      while (getline(ss, palavra)) {
+        if(palavra == "Drama"){
+          solucaoCinema.push_back((x));
+        }
       }
     }
-    if(escolha1 == 2){
-      cout << "(1)Genero\n(2)Tipo\n(3)Duracao\n(4)Ano\n(5)Preco" << endl;
-      cin >> escolhaFiltro;
-
-      switch (escolhaFiltro){
-        case 1:
-          filtrarPorGenero(solucao,matrizGenero,juntaFiltros);
-          break;
-        case 2:
-          filtrarPorTipo(solucao,matrizTipo,juntaFiltros);
-          break;
-        case 3:
-          filtrarPorDuracao(solucao, matrizDuracao,juntaFiltros);
-          break;
-        case 4:
-          filtrarPorAno(solucao, matrizAno,juntaFiltros);
-          break;
-        case 5:
-          filtrarPrecoCinema(matrizPreco,solucaoCinema,precoCinema);
-          break;
-        default:
-          break;
-      }
-      cout << "Outro FIltro? (1)Sim (0)Não" <<endl;
-      cin >> escolha1;
-      if(escolha1 == 1){
-        cout << "filtrar usando (1)OR (2)AND: ";
-        cin >> juntaFiltros;
-      }
-    }
-
-  }while(escolha1 != 0);
+  }
 
   //filtrarE(cinemas,matrizGenero[0],solucaoCinema);
 
   for(auto x : solucaoCinema){
-    cout << x.nomeDoCinema << "("<<x.preco<<")"<< endl;
+    cout << x.nomeDoCinema << endl;
+    
   }
 
-  for(auto x : solucao){
-    cout << "("<<x.genero<<")"<< "("<<x.tipoDoFilme<<")"<< "("<<x.duracao<<")"<<x.idFilme <<endl; 
-  }
-  
+  // for(auto x : solucao){
+  //   cout << "("<<x.idFilmeArt<<")"<<"("<<x.genero<<")"<< "("<<x.tipoDoFilme<<")"<< "(" <<x.duracao<< ")"<<"("<<x.anoLancamento<<")"<<x.tituloOriginal <<endl; 
+  // }
+
   return 0;
 }
