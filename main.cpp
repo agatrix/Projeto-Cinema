@@ -765,7 +765,7 @@ void filtrarPrecoCinema(vector<vector<Cinema>> &cinemas, vector<Cinema> &solucao
   }
 }
 
-void filtrarGeneroCinema(vector<Cinema> &cinemas,vector<Cinema> &solucao){
+void filtrarGeneroCinema(vector<Cinema> &cinemas,vector<Cinema> &solucao,int juntar){
   cout << "Digite o genero:"<<endl;
   listageneros();
   string genero;
@@ -820,8 +820,13 @@ void filtrarGeneroCinema(vector<Cinema> &cinemas,vector<Cinema> &solucao){
     cin >> maisUmGenero;
     aux.clear();
   }
+  if(juntar == 1){
+    filtrarOUCinemas(solucao,cinemas,solucao);
+  }else if(juntar == 2){
+    filtrarECinemas(solucao,cinemas,solucao);
+  }
 } 
-void filtrarTipoCinema(vector<Cinema> &cinemas,vector<Cinema> &solucao){
+void filtrarTipoCinema(vector<Cinema> &cinemas,vector<Cinema> &solucao,int juntar){
   cout << "Digite o tipo:"<<endl;
   listaTipo();
   string tipo;
@@ -868,7 +873,11 @@ void filtrarTipoCinema(vector<Cinema> &cinemas,vector<Cinema> &solucao){
     cin >> maisUmtipo;
     aux.clear();
   }
-  
+  if(juntar == 1){
+    filtrarOUCinemas(solucao,cinemas,solucao);
+  }else if(juntar == 2){
+    filtrarECinemas(solucao,cinemas,solucao);
+  }
 } 
 void filtrarCinemaAno(vector<Cinema>&cinemas, vector<Cinema>&solucao){
   cout << "Deseja buscar por (0)intervalo ou por um (1)ano especifico"<<endl;
@@ -1018,6 +1027,7 @@ int main() {
   int escolha1;
   int escolhaFiltro,escolhaGenero,outroFIltro;
   int juntaFiltros=1;
+  int juntarFiltrosCinemas=1;
  
 
    cout << "(1)Filmes" << endl << "(2)Cinemas" << endl << "(0)Sair" << endl;
@@ -1056,10 +1066,10 @@ int main() {
 
        switch (escolhaFiltro){
          case 1:
-          filtrarGeneroCinema(cinemas,solucaoCinema);
+          filtrarGeneroCinema(cinemas,solucaoCinema,juntarFiltrosCinemas);
           break;
          case 2:
-           filtrarTipoCinema(cinemas,solucaoCinema);
+           filtrarTipoCinema(cinemas,solucaoCinema,juntarFiltrosCinemas);
            break;
          case 3:
            filtrarCinemaDuracao(cinemas,solucaoCinema);
@@ -1078,6 +1088,10 @@ int main() {
        }
        cout << "Outro FIltro? (2)Sim (0)Não" <<endl;
        cin >> escolha1;
+       if(escolha1==2){
+        cout << "(1)OR (2)AND"<<endl;
+        cin >> juntarFiltrosCinemas;
+       }
      }
    }while(escolha1 != 0);
   if(solucao.size() != 0){
