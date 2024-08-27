@@ -622,7 +622,6 @@ void filtrarPorTipo(vector<Filme>&solucao,vector<vector<Filme>>& matrizTipo,int 
       cin >> outroTipo; 
     }
   }else{
-    auto inicioTempoFiltro = high_resolution_clock::now(); //Inicio contagem de tempo inicializacao
     if(juntar == 1)
       filtrarOU(solucao,matrizTipo[tipo],solucao);
     else
@@ -746,6 +745,7 @@ void filtrarPrecoCinema(vector<vector<Cinema>> &cinemas, vector<Cinema> &solucao
   int valor;
   cout<<"Preco maximo: ";
   cin>> valor;
+  auto inicioTempoFiltro = high_resolution_clock::now(); //Inicio contagem de tempo inicializacao
   int indice = buscaBinariaInt(precoCinema,(valor)*100);
   if(indice == -1){
     for(int i = precoCinema.size()-1;i>=0;i--){
@@ -763,14 +763,20 @@ void filtrarPrecoCinema(vector<vector<Cinema>> &cinemas, vector<Cinema> &solucao
       solucao.push_back(x);
     }
   }
+  auto fimTempoFiltro = high_resolution_clock::now(); //Fim da contagem de tempoi inicializacao
+  duration<double> duracaoFiltro = (fimTempoFiltro - inicioTempoFiltro);
+  cout << ">>>>>>>Tempo de Filtragem(segundos): " << duracaoFiltro.count() << endl;
 }
 
 void filtrarGeneroCinema(vector<Cinema> &cinemas,vector<Cinema> &solucao,int juntar){
+  vector<Cinema> copiaSolucao = solucao;
+  solucao.clear();
   cout << "Digite o genero:"<<endl;
   listageneros();
   string genero;
   cin >> genero;
   string palavra;
+  auto inicioTempoFiltro = high_resolution_clock::now(); //Inicio contagem de tempo inicializacao
   for(auto x : cinemas){
     int i =0;
     for(auto y : x.filmes){
@@ -783,6 +789,10 @@ void filtrarGeneroCinema(vector<Cinema> &cinemas,vector<Cinema> &solucao,int jun
       }
     }
   }
+  auto fimTempoFiltro = high_resolution_clock::now(); //Fim da contagem de tempoi inicializacao
+  duration<double> duracaoFiltro = (fimTempoFiltro - inicioTempoFiltro);
+  cout << ">>>>>>>Tempo de Filtragem(segundos): " << duracaoFiltro.count() << endl;
+
   cout << "Deseja filtrar por outro genero?" <<endl;
   cout << "(0)Nao (1)sim"<<endl;
   int maisUmGenero;
@@ -797,6 +807,7 @@ void filtrarGeneroCinema(vector<Cinema> &cinemas,vector<Cinema> &solucao,int jun
     listageneros();
     cin >> genero;
     string palavra;
+    auto inicioTempoFiltro = high_resolution_clock::now(); //Inicio contagem de tempo inicializacao
     for(auto x : cinemas){
       int i =0;
       for(auto y : x.filmes){
@@ -815,22 +826,32 @@ void filtrarGeneroCinema(vector<Cinema> &cinemas,vector<Cinema> &solucao,int jun
     }else{
       filtrarOUCinemas(solucao,aux,solucao);
     }
+    auto fimTempoFiltro = high_resolution_clock::now(); //Fim da contagem de tempoi inicializacao
+    duration<double> duracaoFiltro = (fimTempoFiltro - inicioTempoFiltro);
+    cout << ">>>>>>>Tempo de Filtragem(segundos): " << duracaoFiltro.count() << endl;
+    
     cout << "Deseja filtrar por outro genero?" <<endl;
     cout << "(0)Nao (1)sim"<<endl;
     cin >> maisUmGenero;
     aux.clear();
   }
   if(juntar == 1){
-    filtrarOUCinemas(solucao,cinemas,solucao);
+    filtrarOUCinemas(solucao,copiaSolucao,solucao);
   }else if(juntar == 2){
-    filtrarECinemas(solucao,cinemas,solucao);
+    filtrarECinemas(solucao,copiaSolucao,solucao);
   }
 } 
+
+
 void filtrarTipoCinema(vector<Cinema> &cinemas,vector<Cinema> &solucao,int juntar){
+  vector<Cinema> copiaSolucao = solucao;
+  solucao.clear();
   cout << "Digite o tipo:"<<endl;
   listaTipo();
   string tipo;
   cin >> tipo;
+  
+  auto inicioTempoFiltro = high_resolution_clock::now(); //Inicio contagem de tempo inicializacao
   for(auto x : cinemas){
     int i =0;
     for(auto y : x.filmes){; 
@@ -840,6 +861,11 @@ void filtrarTipoCinema(vector<Cinema> &cinemas,vector<Cinema> &solucao,int junta
       }
     }
   }
+
+  auto fimTempoFiltro = high_resolution_clock::now(); //Fim da contagem de tempoi inicializacao
+  duration<double> duracaoFiltro = (fimTempoFiltro - inicioTempoFiltro);
+  cout << ">>>>>>>Tempo de Filtragem(segundos): " << duracaoFiltro.count() << endl;
+  
   cout << "Deseja filtrar por outro tipo?" <<endl;
   cout << "(0)Nao (1)sim"<<endl;
   int maisUmtipo;
@@ -853,6 +879,7 @@ void filtrarTipoCinema(vector<Cinema> &cinemas,vector<Cinema> &solucao,int junta
     cout << "Digite o tipo:"<<endl;
     listaTipo();
     cin >> tipo;
+    auto inicioTempoFiltro = high_resolution_clock::now(); //Inicio contagem de tempo inicializacao
     for(auto x : cinemas){
       int i =0;
       for(auto y : x.filmes){
@@ -864,22 +891,28 @@ void filtrarTipoCinema(vector<Cinema> &cinemas,vector<Cinema> &solucao,int junta
     }
     if(tipofiltro==0){
       filtrarECinemas(solucao,aux,solucao);
-      cout<<"Os filmes só possuem 1 tipo cada MANE"<<endl;
+      cout<<"Os filmes só possuem 1 tipo cada!"<<endl;
     }else{
       filtrarOUCinemas(solucao,aux,solucao);
     }
+    auto fimTempoFiltro = high_resolution_clock::now(); //Fim da contagem de tempoi inicializacao
+    duration<double> duracaoFiltro = (fimTempoFiltro - inicioTempoFiltro);
+    cout << ">>>>>>>Tempo de Filtragem(segundos): " << duracaoFiltro.count() << endl;
+
     cout << "Deseja filtrar por outro tipo?" <<endl;
     cout << "(0)Nao (1)sim"<<endl;
     cin >> maisUmtipo;
     aux.clear();
   }
   if(juntar == 1){
-    filtrarOUCinemas(solucao,cinemas,solucao);
+    filtrarOUCinemas(solucao,copiaSolucao,solucao);
   }else if(juntar == 2){
-    filtrarECinemas(solucao,cinemas,solucao);
+    filtrarECinemas(solucao,copiaSolucao,solucao);
   }
 } 
-void filtrarCinemaAno(vector<Cinema>&cinemas, vector<Cinema>&solucao){
+void filtrarCinemaAno(vector<Cinema>&cinemas, vector<Cinema>&solucao,int juntar){
+  vector<Cinema> copiaSolucao = solucao;
+  solucao.clear();
   cout << "Deseja buscar por (0)intervalo ou por um (1)ano especifico"<<endl;
   int limiteinf,limitesup,tipoentrada;
   cin >> tipoentrada;
@@ -891,6 +924,7 @@ void filtrarCinemaAno(vector<Cinema>&cinemas, vector<Cinema>&solucao){
     cin >>limiteinf;
     limitesup=limiteinf;
   }
+  auto inicioTempoFiltro = high_resolution_clock::now(); //Inicio contagem de tempo inicializacao
   vector<Filme> aux;
   for (Cinema cinema : cinemas){
     filtrarAno(cinema.filmes,aux,limiteinf,limitesup);
@@ -898,32 +932,72 @@ void filtrarCinemaAno(vector<Cinema>&cinemas, vector<Cinema>&solucao){
       solucao.push_back(cinema);
     aux.clear();
   }
+  auto fimTempoFiltro = high_resolution_clock::now(); //Fim da contagem de tempoi inicializacao
+  duration<double> duracaoFiltro = (fimTempoFiltro - inicioTempoFiltro);
+  cout << ">>>>>>>Tempo de Filtragem(segundos): " << duracaoFiltro.count() << endl;
+
+  if(juntar == 1){
+    filtrarOUCinemas(solucao,copiaSolucao,solucao);
+  }else if(juntar == 2){
+    filtrarECinemas(solucao,copiaSolucao,solucao);
+  }
 }
+
 int calcularDistancia(Cinema &cinema, int x, int y){
   return sqrt(pow(cinema.cordX-x,2)+pow(cinema.cordY-y,2));
 }
-void filtrarDistancia(vector<Cinema>&cinemas,vector<Cinema>&solucao){
+
+void filtrarDistancia(vector<Cinema>&cinemas,vector<Cinema>&solucao,int juntar){
+  vector<Cinema> copiaSolucao = solucao;
+  solucao.clear();
   int x,y,distancia;
   cout << "De as suas coordenadas:\nx: "; cin >> x;
   cout << "y: "; cin >> y;
   cout << "Cinemas ate a distancia: "; cin >> distancia;
+
+  auto inicioTempoFiltro = high_resolution_clock::now(); //Inicio contagem de tempo inicializacao
   for(Cinema cinema :cinemas){
     if(calcularDistancia(cinema,x,y) <= distancia)
       solucao.push_back(cinema);
   }
+
+  auto fimTempoFiltro = high_resolution_clock::now(); //Fim da contagem de tempoi inicializacao
+  duration<double> duracaoFiltro = (fimTempoFiltro - inicioTempoFiltro);
+  cout << ">>>>>>>Tempo de Filtragem(segundos): " << duracaoFiltro.count() << endl;
+  
+  if(juntar == 1){
+    filtrarOUCinemas(solucao,copiaSolucao,solucao);
+  }else if(juntar == 2){
+    filtrarECinemas(solucao,copiaSolucao,solucao);
+  }
 }
-void filtrarCinemaDuracao(vector<Cinema>&cinemas, vector<Cinema>&solucao){
+
+void filtrarCinemaDuracao(vector<Cinema>&cinemas, vector<Cinema>&solucao,int juntar){
+  vector<Cinema> copiaSolucao = solucao;
+  solucao.clear();
   vector<Filme> aux;
   cout << "Intervalo de Tempo: ";
   int limiteinf, limitesup;
   cin >> limiteinf; cin >> limitesup;
+  auto inicioTempoFiltro = high_resolution_clock::now(); //Inicio contagem de tempo inicializacao
   for (Cinema cinema : cinemas){
     filtrarDuracao(cinema.filmes,aux,limiteinf,limitesup);
     if(!aux.empty())
       solucao.push_back(cinema);
     aux.clear();
   }
+  auto fimTempoFiltro = high_resolution_clock::now(); //Fim da contagem de tempoi inicializacao
+  duration<double> duracaoFiltro = (fimTempoFiltro - inicioTempoFiltro);
+  cout << ">>>>>>>Tempo de Filtragem(segundos): " << duracaoFiltro.count() << endl;
+
+  if(juntar == 1){
+    filtrarOUCinemas(solucao,copiaSolucao,solucao);
+  }else if(juntar == 2){
+    filtrarECinemas(solucao,copiaSolucao,solucao);
+  }
 }
+
+//MAIN INICIO CODIGO 
 int main() {
   auto inicioTempo = high_resolution_clock::now(); //Inicio contagem de tempo inicializacao
 
@@ -1027,73 +1101,74 @@ int main() {
   int escolha1;
   int escolhaFiltro,escolhaGenero,outroFIltro;
   int juntaFiltros=1;
-  int juntarFiltrosCinemas=1;
+  int juntarFiltrosCinemas=0;
  
 
-   cout << "(1)Filmes" << endl << "(2)Cinemas" << endl << "(0)Sair" << endl;
-   cin >> escolha1;
-   do{
-     if(escolha1 == 1){
-       cout << "(1)Genero\n(2)Tipo\n(3)Duracao\n(4)Ano" << endl;
-       cin >> escolhaFiltro;
+  cout << "(1)Filmes" << endl << "(2)Cinemas" << endl << "(0)Sair" << endl;
+  cin >> escolha1;
+  do{
+    if(escolha1 == 1){
+      cout << "(1)Genero\n(2)Tipo\n(3)Duracao\n(4)Ano" << endl;
+      cin >> escolhaFiltro;
 
-       switch (escolhaFiltro){
-         case 1:
-           filtrarPorGenero(solucao,matrizGenero,juntaFiltros);
-           break;
-         case 2:
-           filtrarPorTipo(solucao,matrizTipo,juntaFiltros);
-           break;
-         case 3:
-           filtrarPorDuracao(solucao, matrizDuracao,juntaFiltros);
-           break;
-         case 4:
-           filtrarPorAno(solucao, matrizAno,juntaFiltros);
-           break;
-         default:
+      switch (escolhaFiltro){
+        case 1:
+          filtrarPorGenero(solucao,matrizGenero,juntaFiltros);
           break;
-       }
-       cout << "Outro FIltro? (1)Sim (0)Não" <<endl;
-       cin >> escolha1;
-       if(escolha1 == 1){
-         cout << "filtrar usando (1)OR (2)AND: ";
-         cin >> juntaFiltros;
-       }
-     }
-     if(escolha1 == 2){
-       cout << "(1)Genero (2)Tipo (3)Duracao (4)Ano (5)Preco (6)Distancia" << endl;
-       cin >> escolhaFiltro;
+        case 2:
+          filtrarPorTipo(solucao,matrizTipo,juntaFiltros);
+          break;
+        case 3:
+          filtrarPorDuracao(solucao, matrizDuracao,juntaFiltros);
+          break;
+        case 4:
+          filtrarPorAno(solucao, matrizAno,juntaFiltros);
+          break;
+        default:
+        break;
+      }
+      cout << "Outro FIltro? (1)Sim (0)Não" <<endl;
+      cin >> escolha1;
+      if(escolha1 == 1){
+        cout << "filtrar usando (1)OR (2)AND: ";
+        cin >> juntaFiltros;
+      }
+    }
+    if(escolha1 == 2){
+      cout << "(1)Genero (2)Tipo (3)Duracao (4)Ano (5)Preco (6)Distancia" << endl;
+      cin >> escolhaFiltro;
 
-       switch (escolhaFiltro){
-         case 1:
-          filtrarGeneroCinema(cinemas,solucaoCinema,juntarFiltrosCinemas);
+      switch (escolhaFiltro){
+        case 1:
+        filtrarGeneroCinema(cinemas,solucaoCinema,juntarFiltrosCinemas);
+        break;
+        case 2:
+          filtrarTipoCinema(cinemas,solucaoCinema,juntarFiltrosCinemas);
           break;
-         case 2:
-           filtrarTipoCinema(cinemas,solucaoCinema,juntarFiltrosCinemas);
-           break;
-         case 3:
-           filtrarCinemaDuracao(cinemas,solucaoCinema);
-           break;
-         case 4:
-           filtrarCinemaAno(cinemas,solucaoCinema);
-           break;
-         case 5:
-           filtrarPrecoCinema(matrizPreco,solucaoCinema,precoCinema);
-           break;
-          case 6:
-            filtrarDistancia(cinemas,solucaoCinema);
+        case 3:
+          filtrarCinemaDuracao(cinemas,solucaoCinema,juntarFiltrosCinemas);
           break;
-         default:
-           break;
-       }
-       cout << "Outro FIltro? (2)Sim (0)Não" <<endl;
-       cin >> escolha1;
-       if(escolha1==2){
-        cout << "(1)OR (2)AND"<<endl;
-        cin >> juntarFiltrosCinemas;
-       }
-     }
-   }while(escolha1 != 0);
+        case 4:
+          filtrarCinemaAno(cinemas,solucaoCinema,juntarFiltrosCinemas);
+          break;
+        case 5:
+          filtrarPrecoCinema(matrizPreco,solucaoCinema,precoCinema);
+          break;
+        case 6:
+          filtrarDistancia(cinemas,solucaoCinema,juntarFiltrosCinemas);
+        break;
+        default:
+          break;
+      }
+      cout << "Outro FIltro? (2)Sim (0)Não" <<endl;
+      cin >> escolha1;
+      if(escolha1==2){
+      cout << "(1)OR (2)AND"<<endl;
+      cin >> juntarFiltrosCinemas;
+      }
+    }
+  }while(escolha1 != 0);
+
   if(solucao.size() != 0){
     for(auto x : solucao){
       cout << x.tituloOriginal << endl;
