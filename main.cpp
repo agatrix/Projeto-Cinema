@@ -715,7 +715,7 @@ void filtrarPorAno(vector<Filme>&solucao, vector<vector<Filme>>&filmes,int junta
   }
 }
 
-//FILTRAGEM DE CINEMA
+//FILTRAGEM DE CINEMAa
 void filtrarECinemas(vector<Cinema> cinemas, vector<Cinema> &cinemas2, vector<Cinema>& solucao){
   solucao.clear();
  
@@ -741,8 +741,10 @@ void filtrarOUCinemas(vector<Cinema> cinemas,vector<Cinema> &cinemas2,vector<Cin
   mergeCinemas(solucaoCinemas,0,cinemas.size()-1,solucaoCinemas.size()-1);
 }
 
-void filtrarPrecoCinema(vector<vector<Cinema>> &cinemas, vector<Cinema> &solucao, vector<int> precoCinema){ 
+void filtrarPrecoCinema(vector<vector<Cinema>> &cinemas, vector<Cinema> &solucao, vector<int> precoCinema, int juntar){ 
   int valor;
+  vector<Cinema> copiaSolucao = solucao;
+  solucao.clear();
   cout<<"Preco maximo: ";
   cin>> valor;
   auto inicioTempoFiltro = high_resolution_clock::now(); //Inicio contagem de tempo inicializacao
@@ -756,16 +758,27 @@ void filtrarPrecoCinema(vector<vector<Cinema>> &cinemas, vector<Cinema> &solucao
     }
   }
   if(indice == -1 && (valor)*100-precoCinema[51] > 0){
-   indice = 51; 
+    indice = 51; 
   }
+  int tam;
   for(int i = 0; i <= indice; i++){
+    tam = solucao.size();
     for(auto x : cinemas[i]){
       solucao.push_back(x);
     }
+    if(i!=0)
+      mergeCinemas(solucao,0,tam-1,solucao.size()-1);
   }
+
   auto fimTempoFiltro = high_resolution_clock::now(); //Fim da contagem de tempoi inicializacao
   duration<double> duracaoFiltro = (fimTempoFiltro - inicioTempoFiltro);
   cout << ">>>>>>>Tempo de Filtragem(segundos): " << duracaoFiltro.count() << endl;
+
+  if(juntar == 1){
+    filtrarOUCinemas(solucao,copiaSolucao,solucao);
+  }else if(juntar == 2){
+    filtrarECinemas(solucao,copiaSolucao,solucao);
+  }
 }
 
 void filtrarGeneroCinema(vector<Cinema> &cinemas,vector<Cinema> &solucao,int juntar){
@@ -1152,7 +1165,7 @@ int main() {
           filtrarCinemaAno(cinemas,solucaoCinema,juntarFiltrosCinemas);
           break;
         case 5:
-          filtrarPrecoCinema(matrizPreco,solucaoCinema,precoCinema);
+          filtrarPrecoCinema(matrizPreco,solucaoCinema,precoCinema,juntarFiltrosCinemas);
           break;
         case 6:
           filtrarDistancia(cinemas,solucaoCinema,juntarFiltrosCinemas);
